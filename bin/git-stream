@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+usage() {
+    version
+    echo "Usage: git stream <subcommand>"
+    echo
+    echo "Available subcommands are:"
+    echo
+    echo "init      Initialize your repo for use with Git Stream"
+    echo "feature   Work with Features"
+    echo "hotfix    Work with Hotfixes"
+    echo "release   Work with Releases"
+    echo "help      Show this help"
+    echo "version   Show the Version"
+}
+
+version() {
+    echo "Git Stream 0.0.1"
+    echo
+}
+
+main() {
+    if [ "$#" -lt 1 ]; then
+        usage; exit 1
+    fi
+
+    local subCommand="$1"; shift
+
+    case $subCommand in
+        "-h"|"--help")
+            usage; exit 0
+            ;;
+        "-v"|"--version")
+            version; exit 0
+            ;;
+    esac
+
+    local workingDirectory=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+    if [ ! -e "$workingDirectory/git-stream-$subCommand" ]; then
+        usage; exit 1
+    fi
+
+    source "$workingDirectory/git-stream-$subCommand"
+
+    if [ ! type "cmd_$subCommand" ]; then
+        usage; exit 1
+    fi
+
+    cmd_${subCommand} "$@"
+}
+
+main "$@"

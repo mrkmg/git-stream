@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+workingDirectory=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+source ${workingDirectory}/../lib/ini-parser/ini_parser.sh
+
+USE_DEFAULTS=0
+FORCE=0
+VERSION_PREFIX=
+FEATURE_BRANCH=
+HOTFIX_BRANCH=
+RELEASE_BRANCH=
+MASTER_BRANCH=
+REMOTE=
+
+unknownOptionMessage() {
+    echo "Unknown Option: $1"
+}
+
+alreadyInitializedMessage() {
+    echo "Already Initialized, use -f to force reinitialization"
+}
+
+usage() {
+    echo "Usage: git stream init <options>"
+    echo
+    echo "Available options are:"
+    echo
+    echo "-d, --defaults    Initialize with all default options"
+    echo "-f, --force       Force Initialization"
+}
+
+parseConfig() {
+    config_parser ./.git/config
+}
+
+checkIsAlreadyInitialized() {
+    return 1
+}
+
+removeOldInitialization() {
+    return 0
+}
+
+main() {
+    local option=""
+    while [[ $# -gt 0 ]]; do
+        option="$1"; shift
+
+        case ${option} in
+            -h|--help)
+                usage; exit 0
+                ;;
+            -d|--defaults)
+                USE_DEFAULTS=1
+                ;;
+            -f|--force)
+                FORCE=1
+                ;;
+            --remote)
+                REMOTE=$1; shift
+                ;;
+            --version-prefix)
+                VERSION_PREFIX=$1; shift
+                ;;
+            --feature-branch)
+                FEATURE_BRANCH=$1; shift
+                ;;
+            --hotfix-branch)
+                HOTFIX_BRANCH=$1; shift
+                ;;
+            --release-branch)
+                RELEASE_BRANCH=$1; shift
+                ;;
+            *)
+                unknownOptionMessage ${option}; usage; exit 1
+                ;;
+        esac
+    done
+
+    cat ./.git/config | parseIniFile
+    listKeys
+#
+#    checkIsAlreadyInitialized
+#    local isAlreadyInitialized=$?
+#
+#    if [[ ${FORCE} -eq 0 && ${isAlreadyInitialized} -eq 1 ]]; then
+#        alreadyInitializedMessage; exit 1;
+#    fi
+
+    exit 0
+}
+
+main "$@"
