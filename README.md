@@ -1,14 +1,24 @@
 #Git Stream
 
-Git Stream is a branching model inspired by [git-flow](https://github.com/nvie/gitflow). I really enjoy what git-flow offers, but the multiple primary branches always kind of bugged me. It also makes working with GitHub a pain.
+Git Stream is a branching model inspired by [git-flow](https://github.com/nvie/gitflow). I really enjoy what git-flow offers, but the multiple primary branches always kind of bugged me, the multiple branches which do the same thing (feature/support/bugfix), and dealing with pull requests always kind of bugged me. After reading this [blog](http://endoflineblog.com/gitflow-considered-harmful) I decided I would build my own "git-flow".
 
-#Warning
+The name "Git Stream" was chosen as this plugin should streamline some of the repetitious actions in git.
+
+####Warning
 
 Git Stream is still very new, with minimal testing by a single person so far. While I am open to suggestions, bug reports, etc know that this project is a long ways away from being ready for real use. As the project matures, this warning will be updated.
 
 ##Installation
 
-Coming Soon
+Clone the repo and run make install
+
+    git clone https://github.com/mrkmg/git-stream.git
+    cd git-stream
+    sudo make install
+
+By default, git-stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can change the prefix. for example:
+
+    PREFIX=/usr sudo make install
 
 ##Usage
 
