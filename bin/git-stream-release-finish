@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+gitstream_release_finish() {
+    local version prefixedVersion branch
+
+    gitstream_environment
+
+    if [ $# -ne 1 ]; then
+        usage; exit 1;
+    fi
+
+    version="$1"
+    prefixedVersion="${VERSION_PREFIX}${version}"
+    branch="${RELEASE_PREFIX}${prefixedVersion}"
+
+    if git_rev_exists ${prefixedVersion}; then
+        (>&2 echo "Tag ${prefixedVersion} already exists")
+        exit 1
+    fi
+
+    if ! git_rev_exists ${branch}; then
+        (>&2 echo "Branch ${branch} does not exist")
+        exit 1
+    fi
+
+    if [ "$(git_current_branch)" != "${branch}" ]; then
+        (>&2 echo "You are not currently on ${branch}")
+        exit 1
+    fi
+
+    if ! git_working_dir_clean; then
+        (>&2 echo "Working directory not clean")
+        exit 1
+    fi
+
+    if ! do_git checkout ${WORKING_BRANCH}; then
+        (>&2 echo "Failed to checkout ${WORKING_BRANCH}")
+        exit 1
+    fi
+
+    if ! do_git --ff-only merge ${branch}; then
+        (>&2 echo "Failed to merge ${branch} into ${WORKING_BRANCH}. FF is the only allowed release merge type")
+        do_git merge --abort
+        do_git checkout ${branch}
+        exit 1
+    fi
+
+    if ! do_git tag ${prefixedVersion}; then
+        (>&2 echo "Failed to create tag ${prefixedVersion}")
+        exit 1
+    fi
+
+    if ! do_git branch -d ${branch}; then
+        (>&2 echo "Failed to remove ${branch}")
+        exit 1
+    fi
+
+    echo
+    echo "Release ${version} has been merged into ${WORKING_BRANCH} and a tag made"
+}

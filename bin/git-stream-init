@@ -1,24 +1,11 @@
 #!/usr/bin/env bash
-
-workingDirectory=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
-source ${workingDirectory}/../lib/ini-parser/ini_parser.sh
-
 USE_DEFAULTS=0
 FORCE=0
-VERSION_PREFIX=
-FEATURE_BRANCH=
-HOTFIX_BRANCH=
-RELEASE_BRANCH=
-MASTER_BRANCH=
-REMOTE=
-
-unknownOptionMessage() {
-    echo "Unknown Option: $1"
-}
-
-alreadyInitializedMessage() {
-    echo "Already Initialized, use -f to force reinitialization"
-}
+VERSION_PREFIX=""
+FEATURE_PREFIX=""
+HOTFIX_PREFIX=""
+RELEASE_PREFIX=""
+WORKING_PREFIX=""
 
 usage() {
     echo "Usage: git stream init <options>"
@@ -29,21 +16,90 @@ usage() {
     echo "-f, --force       Force Initialization"
 }
 
-parseConfig() {
-    config_parser ./.git/config
+unknownOptionMessage() {
+    echo "Unknown Option: $1"
 }
 
-checkIsAlreadyInitialized() {
-    return 1
+alreadyInitializedMessage() {
+    echo "Already Initialized, use -f to force reinitialization"
+}
+
+finishedMessage() {
+    echo "Git Stream is initialized!"
+}
+
+setDefaults() {
+    if [[ -z ${VERSION_PREFIX} ]]; then
+        VERSION_PREFIX=""
+    fi
+
+    if [[ -z ${FEATURE_PREFIX} ]]; then
+        FEATURE_PREFIX="feature/"
+    fi
+
+    if [[ -z ${HOTFIX_PREFIX} ]]; then
+        HOTFIX_PREFIX="hotfix/"
+    fi
+
+    if [[ -z ${RELEASE_PREFIX} ]]; then
+        RELEASE_PREFIX="release/"
+    fi
+
+    if [[ -z ${WORKING_BRANCH} ]]; then
+        WORKING_BRANCH="master"
+    fi
+
+}
+
+promptForNeededConfiguration() {
+    if [[ -z ${VERSION_PREFIX} ]]; then
+        read -p "Version Prefix []: " VERSION_PREFIX
+    fi;
+
+    if [[ -z ${FEATURE_PREFIX} ]]; then
+        read -p "Feature Branch Prefix [feature/]: " FEATURE_PREFIX
+    fi;
+
+    if [[ -z ${HOTFIX_PREFIX} ]]; then
+        read -p "Hotfix Branch Prefix [hotfix/]: " HOTFIX_PREFIX
+    fi;
+
+    if [[ -z ${RELEASE_PREFIX} ]]; then
+        read -p "Release Branch Prefix [release/]: " RELEASE_PREFIX
+    fi;
+
+    if [[ -z ${WORKING_BRANCH} ]]; then
+        read -p "Working Branch [master]: " WORKING_BRANCH
+    fi;
+
+    if [[ -z ${REMOTE} ]]; then
+        read -p "Default Remote [origin]: " REMOTE
+    fi;
 }
 
 removeOldInitialization() {
     return 0
 }
 
-main() {
+writeConfig() {
+    git config gitstream.branch.working ${WORKING_BRANCH}
+    git config gitstream.prefix.version ${VERSION_PREFIX}
+    git config gitstream.prefix.feature ${FEATURE_PREFIX}
+    git config gitstream.prefix.hotfix ${HOTFIX_PREFIX}
+    git config gitstream.prefix.release ${RELEASE_PREFIX}
+}
+
+moveToWorkingBranch() {
+    local currentBranch=$(git_current_branch)
+
+    if [[ ${currentBranch} != ${WORKING_BRANCH} ]]; then
+        git checkout -B ${WORKING_BRANCH}
+    fi
+}
+
+gitstream_init() {
     local option=""
-    while [[ $# -gt 0 ]]; do
+    while [ $# -gt 0 ]; do
         option="$1"; shift
 
         case ${option} in
@@ -56,20 +112,17 @@ main() {
             -f|--force)
                 FORCE=1
                 ;;
-            --remote)
-                REMOTE=$1; shift
-                ;;
             --version-prefix)
                 VERSION_PREFIX=$1; shift
                 ;;
-            --feature-branch)
-                FEATURE_BRANCH=$1; shift
+            --feature-prefix)
+                FEATURE_PREFIX=$1; shift
                 ;;
-            --hotfix-branch)
-                HOTFIX_BRANCH=$1; shift
+            --hotfix-prefix)
+                HOTFIX_PREFIX=$1; shift
                 ;;
-            --release-branch)
-                RELEASE_BRANCH=$1; shift
+            --release-prefix)
+                RELEASE_PREFIX=$1; shift
                 ;;
             *)
                 unknownOptionMessage ${option}; usage; exit 1
@@ -77,17 +130,25 @@ main() {
         esac
     done
 
-    cat ./.git/config | parseIniFile
-    listKeys
-#
-#    checkIsAlreadyInitialized
-#    local isAlreadyInitialized=$?
-#
-#    if [[ ${FORCE} -eq 0 && ${isAlreadyInitialized} -eq 1 ]]; then
-#        alreadyInitializedMessage; exit 1;
-#    fi
+    if gitstream_is_initialized && [ ${FORCE} -eq 0 ]; then
+        alreadyInitializedMessage; exit 1;
+    fi
+
+    if [ ${USE_DEFAULTS} -eq 1 ]; then
+        setDefaults
+    else
+        promptForNeededConfiguration
+        setDefaults
+    fi
+
+    if gitstream_is_initialized; then
+        git config --remove-section gitstream.branch
+        git config --remove-section gitstream.prefix
+    fi
+
+    writeConfig
+    moveToWorkingBranch
+    finishedMessage
 
     exit 0
 }
-
-main "$@"

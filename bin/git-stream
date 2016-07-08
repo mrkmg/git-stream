@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+WORKING_DIR=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
+
 usage() {
     version
     echo "Usage: git stream <subcommand>"
@@ -11,12 +13,85 @@ usage() {
     echo "hotfix    Work with Hotfixes"
     echo "release   Work with Releases"
     echo "help      Show this help"
-    echo "version   Show the Version"
+    echo "version   Show the Version and exit"
 }
 
 version() {
     echo "Git Stream 0.0.1"
     echo
+}
+
+git_current_branch () {
+  local _saved_ifs _branch
+  _saved_ifs=${IFS}
+  IFS=:
+  _branch=`git branch 2> /dev/null`
+  if [ $? -eq 0 ]; then
+    echo -n "$1`echo ${_branch} | grep '^*' | sed -e 's/\*\ //'`$2"
+  fi
+  IFS=${_saved_ifs}
+}
+
+git_rev_exists() {
+    if git rev-parse $1 >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+git_working_dir_clean() {
+    if [ -z "$(git status --porcelain 2>&1)" ]; then
+      return 0
+    else
+      return 1
+    fi
+}
+
+do_git() {
+    git "$@" >/dev/null 2>&1
+    return $?
+}
+
+gitstream_is_initialized() {
+    if git config --get gitstream.branch.working >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+gitstream_environment() {
+    if ! gitstream_is_initialized; then
+        print_error "Git Stream is not initialized. Please run 'git stream init' first"
+        exit 1
+    fi
+
+    VERSION_PREFIX=$(git config gitstream.prefix.version)
+    FEATURE_PREFIX=$(git config gitstream.prefix.feature)
+    HOTFIX_PREFIX=$(git config gitstream.prefix.hotfix)
+    RELEASE_PREFIX=$(git config gitstream.prefix.release)
+    WORKING_BRANCH=$(git config gitstream.branch.working)
+}
+
+gitstream_source() {
+    local command commandType file func
+
+    command="$1"
+    file="${WORKING_DIR}/git-stream-${command}"
+    func="gitstream_$(echo ${command} | sed s/\-/\_/g)"
+
+    source ${file}
+
+    commandType=$(type ${func} | head -n 1)
+
+    if [ "${commandType}" != "${func} is a function" ]; then
+        usage; exit 1
+    fi
+}
+
+print_error() {
+    echo $1 >&2
 }
 
 main() {
@@ -26,7 +101,7 @@ main() {
 
     local subCommand="$1"; shift
 
-    case $subCommand in
+    case ${subCommand} in
         "-h"|"--help")
             usage; exit 0
             ;;
@@ -35,18 +110,9 @@ main() {
             ;;
     esac
 
-    local workingDirectory=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
-    if [ ! -e "$workingDirectory/git-stream-$subCommand" ]; then
-        usage; exit 1
-    fi
+    gitstream_source "${subCommand}"
 
-    source "$workingDirectory/git-stream-$subCommand"
-
-    if [ ! type "cmd_$subCommand" ]; then
-        usage; exit 1
-    fi
-
-    cmd_${subCommand} "$@"
+    gitstream_${subCommand} "$@"
 }
 
 main "$@"

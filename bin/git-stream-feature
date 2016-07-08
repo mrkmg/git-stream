@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+usage() {
+    echo "Usage: git stream feature <subcommand>"
+    echo
+    echo "Available subcommands are:"
+    echo
+    echo "start {feature-name}"
+    echo "finish {feature-name}"
+}
+
+gitstream_feature() {
+    if [ "$#" -ne 1 ]; then
+        usage; exit 1
+    fi
+
+    local subCommand="$1"; shift
+
+    case ${subCommand} in
+        "-h"|"--help")
+            usage; exit 0
+            ;;
+    esac
+
+    gitstream_source "feature-${subCommand}"
+
+    gitstream_feature_${subCommand} "$@"
+}

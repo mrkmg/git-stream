@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+gitstream_feature_finish() {
+    local feature branch
+
+    gitstream_environment
+
+    if [ $# -ne 1 ]; then
+        usage; exit 1;
+    fi
+
+    feature="$1"
+    branch="${FEATURE_PREFIX}${feature}"
+
+    if ! git_rev_exists ${branch}; then
+        print_error "Branch ${branch} does not exist"
+        exit 1
+    fi
+
+    if [ "$(git_current_branch)" != "${branch}" ]; then
+        print_error "You are not currently on ${branch}"
+        exit 1
+    fi
+
+    if ! git_working_dir_clean; then
+        print_error "Working directory not clean"
+        exit 1
+    fi
+
+    if ! do_git checkout ${WORKING_BRANCH}; then
+        print_error "Failed to checkout ${WORKING_BRANCH}"
+        exit 1
+    fi
+
+    if ! do_git merge ${branch}; then
+        do_git merge --abort
+        do_git checkout ${branch}
+        print_error "Failed to merge ${branch} into ${WORKING_BRANCH}. Rebase Needed"
+        exit 1
+    fi
+
+    if ! do_git branch -d ${branch}; then
+        print_error "Failed to remove ${branch}"
+        exit 1
+    fi
+
+    echo
+    echo "Feature ${feature} has been merged into ${WORKING_BRANCH}"
+}

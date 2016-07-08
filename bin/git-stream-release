@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+usage() {
+    echo "Usage: git stream release <subcommand>"
+    echo
+    echo "Available subcommands are:"
+    echo
+    echo "start {version}"
+    echo "finish {version}"
+}
+
+gitstream_release() {
+    if [ "$#" -lt 1 ]; then
+        usage; exit 1
+    fi
+
+    local subCommand="$1"; shift
+
+    case ${subCommand} in
+        "-h"|"--help")
+            usage; exit 0
+            ;;
+    esac
+
+    gitstream_source "release-${subCommand}"
+
+    gitstream_release_${subCommand} "$@"
+}

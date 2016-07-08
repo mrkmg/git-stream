@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+usage() {
+    echo "Usage: git stream hotfix <subcommand>"
+    echo
+    echo "Available subcommands are:"
+    echo
+    echo "start {version} {hotfix-name}"
+    echo "finish {version} {hotfix-name} {new_version}"
+}
+
+gitstream_hotfix() {
+    if [ "$#" -lt 1 ]; then
+        usage; exit 1
+    fi
+
+    local subCommand="$1"; shift
+
+    case ${subCommand} in
+        "-h"|"--help")
+            usage; exit 0
+            ;;
+    esac
+
+
+    gitstream_source "hotfix-${subCommand}"
+
+    gitstream_hotfix_${subCommand} "$@"
+}
