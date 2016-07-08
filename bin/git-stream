@@ -17,7 +17,7 @@ usage() {
 }
 
 version() {
-    echo "Git Stream 0.0.1"
+    echo "Git Stream 0.1.0"
     echo
 }
 
