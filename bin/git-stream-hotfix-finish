@@ -1,20 +1,33 @@
 #!/usr/bin/env bash
 
 gitstream_hotfix_finish() {
-    local version hotfix newVersion prefixedVersion newPrefixedVersion branch
+    local version hotfix newVersion prefixedVersion newPrefixedVersion branch merge arg
+
+    merge=1
 
     gitstream_environment
 
-    if [ $# -ne 3 ]; then
+    if [ $# -lt 3 ]; then
         usage; exit 1;
     fi
+
+    while arg=$1 && [ "${arg:0:1}" == "-" ]; do
+        case ${arg} in
+            "-n"|"--no-merge")
+                merge=0; shift
+                ;;
+            *)
+                usage; exit 1
+                ;;
+        esac
+    done
 
     version="$1"
     hotfix="$2"
     newVersion="$3"
     prefixedVersion="${VERSION_PREFIX}${version}"
-    newPrefixedVersion="${VERSION_PREFIX}{$newVersion}"
-    branch="${HOTFIX_PREFIX}/${version}/${hotfix}"
+    newPrefixedVersion="${VERSION_PREFIX}${newVersion}"
+    branch="${HOTFIX_PREFIX}${version}-${hotfix}"
 
     if ! git_rev_exists ${branch}; then
         print_error "Branch ${branch} does not exist"
@@ -31,25 +44,35 @@ gitstream_hotfix_finish() {
         exit 1
     fi
 
+    if ! do_git tag ${newPrefixedVersion}; then
+        print_error "Failed to make new tag ${newPrefixedVersion}."
+        bug_error_message
+        exit 1
+    fi
+
+    echo "The new release ${newPrefixedVersion} has been created."
+
     if ! do_git checkout ${WORKING_BRANCH}; then
-        print_error "Failed to checkout ${WORKING_BRANCH}"
+        print_error "Failed to checkout #{WORKING_BRANCH}"
+        bug_error_message
         exit 1
     fi
 
-    if ! do_git merge ${branch}; then
-        do_git merge --abort
-        do_git checkout ${branch}
-        print_error "Failed to merge ${branch} into ${WORKING_BRANCH}. Rebase Needed"
-        exit 1
-    fi
-
-    do_git checkout ${branch}
-
-    if ! do_git branch -d ${branch}; then
+    if ! do_git branch -D ${branch}; then
         print_error "Failed to remove ${branch}"
+        bug_error_message
         exit 1
     fi
 
-    echo
-    echo "Feature ${feature} has been merged into ${WORKING_BRANCH}"
+    if [ ${merge} -eq 1 ]; then
+
+        if ! do_git merge ${newPrefixedVersion}; then
+            print_error "There were merge problems. Please resolve any conflicts and commit to complete."
+            exit 1
+        fi
+
+        echo "${hotfix} has been applied to master."
+    fi
+
+
 }

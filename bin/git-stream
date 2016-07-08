@@ -81,6 +81,10 @@ gitstream_source() {
     file="${WORKING_DIR}/git-stream-${command}"
     func="gitstream_$(echo ${command} | sed s/\-/\_/g)"
 
+    if ! [ -e ${file} ]; then
+        usage; exit 1
+    fi
+
     source ${file}
 
     commandType=$(type ${func} | head -n 1)
@@ -94,8 +98,14 @@ print_error() {
     echo $1 >&2
 }
 
+bug_error_message() {
+    print_error ""
+    print_error "This should not have happened"
+    print_error "Please report this bug at https://github.com/mrkmg/git-stream/issues/new"
+}
+
 main() {
-    if [ "$#" -lt 1 ]; then
+    if [ "$#" -eq 0 ]; then
         usage; exit 1
     fi
 

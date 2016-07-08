@@ -14,6 +14,11 @@ usage() {
     echo
     echo "-d, --defaults    Initialize with all default options"
     echo "-f, --force       Force Initialization"
+    echo "--version-prefix  Version Prefix []"
+    echo "--feature-prefix  Feature Branch Prefix [feature/]"
+    echo "--hotfix-prefix   Hotfix Branch Prefix [hotfix/]"
+    echo "--release-prefix  Release Branch Prefix [release/]"
+    echo "--working-branch  Working Branch [master]"
 }
 
 unknownOptionMessage() {
@@ -71,10 +76,6 @@ promptForNeededConfiguration() {
     if [[ -z ${WORKING_BRANCH} ]]; then
         read -p "Working Branch [master]: " WORKING_BRANCH
     fi;
-
-    if [[ -z ${REMOTE} ]]; then
-        read -p "Default Remote [origin]: " REMOTE
-    fi;
 }
 
 removeOldInitialization() {
@@ -123,6 +124,9 @@ gitstream_init() {
                 ;;
             --release-prefix)
                 RELEASE_PREFIX=$1; shift
+                ;;
+            --working-branch)
+                WORKING_BRANCH=$1; shift
                 ;;
             *)
                 unknownOptionMessage ${option}; usage; exit 1

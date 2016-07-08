@@ -14,44 +14,44 @@ gitstream_release_finish() {
     branch="${RELEASE_PREFIX}${prefixedVersion}"
 
     if git_rev_exists ${prefixedVersion}; then
-        (>&2 echo "Tag ${prefixedVersion} already exists")
+        print_error echo "Tag ${prefixedVersion} already exists"
         exit 1
     fi
 
     if ! git_rev_exists ${branch}; then
-        (>&2 echo "Branch ${branch} does not exist")
+        print_error echo "Branch ${branch} does not exist"
         exit 1
     fi
 
     if [ "$(git_current_branch)" != "${branch}" ]; then
-        (>&2 echo "You are not currently on ${branch}")
+        print_error echo "You are not currently on ${branch}"
         exit 1
     fi
 
     if ! git_working_dir_clean; then
-        (>&2 echo "Working directory not clean")
+        print_error echo "Working directory not clean"
         exit 1
     fi
 
     if ! do_git checkout ${WORKING_BRANCH}; then
-        (>&2 echo "Failed to checkout ${WORKING_BRANCH}")
+        print_error echo "Failed to checkout ${WORKING_BRANCH}"
         exit 1
     fi
 
-    if ! do_git --ff-only merge ${branch}; then
-        (>&2 echo "Failed to merge ${branch} into ${WORKING_BRANCH}. FF is the only allowed release merge type")
+    if ! do_git merge ${branch}; then
+        print_error echo "Failed to merge ${branch} into ${WORKING_BRANCH}. Could not auto-merge."
         do_git merge --abort
         do_git checkout ${branch}
         exit 1
     fi
 
     if ! do_git tag ${prefixedVersion}; then
-        (>&2 echo "Failed to create tag ${prefixedVersion}")
+        print_error echo "Failed to create tag ${prefixedVersion}"
         exit 1
     fi
 
     if ! do_git branch -d ${branch}; then
-        (>&2 echo "Failed to remove ${branch}")
+        print_error echo "Failed to remove ${branch}"
         exit 1
     fi
 

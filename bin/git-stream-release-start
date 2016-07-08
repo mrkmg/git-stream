@@ -28,7 +28,11 @@ gitstream_release_start() {
         exit 1
     fi
 
-    do_git checkout -b "${branch}"
+    if ! do_git checkout -b "${branch}"; then
+        print_error "Failed to create the new branch ${branch}."
+        bug_error_message
+        exit 1
+    fi
 
     echo
     echo "Your are now on ${branch}. When you are done with the release, run git stream finish release ${version}"
