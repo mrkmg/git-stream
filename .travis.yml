@@ -1,5 +1,10 @@
 sudo: false
 language: bash
-
+os:
+  - linux
+  - osx
+before_script:
+  - git config --global user.email "test@test.com"
+  - git config --global user.name "Testing Tester"
 script:
   - make test

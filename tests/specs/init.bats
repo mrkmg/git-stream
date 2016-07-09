@@ -7,7 +7,7 @@ STARTING_PATH="$(pwd)"
 PATH="$(pwd)/bin:$PATH"
 
 setup() {
-    TESTING_PATH=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
+    TESTING_PATH=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
     rm -rf ${TESTING_PATH}
     make_test_repo ${TESTING_PATH}
     cd ${TESTING_PATH}
