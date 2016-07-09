@@ -18,6 +18,9 @@ COMMANDS    +=  git-stream-release-finish
 all:
 	@echo "usage: make [install|uninstall]"
 
+test:
+	./tests/bats/bin/bats ./tests/specs/*
+
 install:
 	cd $(SOURCE_DIR) && \
 	install -d -m 0755 $(BIN_DIR) && \
