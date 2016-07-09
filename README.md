@@ -1,5 +1,7 @@
 #Git Stream
 
+[![Build Status](https://travis-ci.org/mrkmg/git-stream.svg?branch=master)](https://travis-ci.org/mrkmg/git-stream)
+
 Git Stream is a branching model inspired by [git-flow](https://github.com/nvie/gitflow). I really enjoy what git-flow offers, but the multiple primary branches always kind of bugged me, the multiple branches which do the same thing (feature/support/bugfix), and dealing with pull requests always kind of bugged me. After reading this [blog](http://endoflineblog.com/gitflow-considered-harmful) I decided I would build my own "git-flow".
 
 The name "Git Stream" was chosen as this plugin should streamline some of the repetitious actions in git.

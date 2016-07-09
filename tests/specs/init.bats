@@ -29,13 +29,13 @@ teardown() {
 }
 
 @test "INIT: cli options" {
-    git stream init --version-prefix "v" --feature-prefix "f"  --hotfix-prefix "h"  --release-prefix "r" --working-branch "w"
+    git stream init --version-prefix "c_v" --feature-prefix "c_f"  --hotfix-prefix "c_h"  --release-prefix "c_r" --working-branch "c_w"
 
-    [ "$(git config gitstream.branch.working)" == "w" ]
-    [ "$(git config gitstream.prefix.feature)" == "f" ]
-    [ "$(git config gitstream.prefix.hotfix)" == "h" ]
-    [ "$(git config gitstream.prefix.release)" == "r" ]
-    [ "$(git config gitstream.prefix.version)" == "v" ]
+    [ "$(git config gitstream.branch.working)" == "c_w" ]
+    [ "$(git config gitstream.prefix.feature)" == "c_f" ]
+    [ "$(git config gitstream.prefix.hotfix)" == "c_h" ]
+    [ "$(git config gitstream.prefix.release)" == "c_r" ]
+    [ "$(git config gitstream.prefix.version)" == "c_v" ]
 }
 
 @test "INIT: interactive" {
