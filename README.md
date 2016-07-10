@@ -21,6 +21,7 @@ Basic Procedure
 - Test on your platform. If you encounter a failing test, please report it as an issue
 - Install
 
+Example Installation on Linux
 
     git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
     cd /tmp/git-stream
