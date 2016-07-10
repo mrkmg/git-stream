@@ -32,11 +32,6 @@ gitstream_hotfix_finish() {
         exit 1
     fi
 
-    if [ "$(git_current_branch)" != "${branch}" ]; then
-        print_error "You are not currently on ${branch}"
-        exit 1
-    fi
-
     if ! git_working_dir_clean; then
         print_error "Working directory not clean"
         exit 1
