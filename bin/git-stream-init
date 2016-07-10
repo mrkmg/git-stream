@@ -12,13 +12,13 @@ usage() {
     echo
     echo "Available options are:"
     echo
-    echo "-d, --defaults    Initialize with all default options"
-    echo "-f, --force       Force Initialization"
-    echo "--version-prefix  Version Prefix []"
-    echo "--feature-prefix  Feature Branch Prefix [feature/]"
-    echo "--hotfix-prefix   Hotfix Branch Prefix [hotfix/]"
-    echo "--release-prefix  Release Branch Prefix [release/]"
-    echo "--working-branch  Working Branch [master]"
+    echo "-d, --defaults             Initialize with all default options"
+    echo "-f, --force                Force Initialization"
+    echo "--version-prefix {prefix}  Version Prefix []"
+    echo "--feature-prefix {prefix}  Feature Branch Prefix [feature/]"
+    echo "--hotfix-prefix {prefix}   Hotfix Branch Prefix [hotfix/]"
+    echo "--release-prefix {prefix}  Release Branch Prefix [release/]"
+    echo "--working-branch {prefix}  Working Branch [master]"
 }
 
 unknownOptionMessage() {

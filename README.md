@@ -34,37 +34,39 @@ All Git Stream commands are issued as follows:
 
 Initialize Git Stream on the current project.
 
-- -d, --defaults    Initialize with all default options
-- -f, --force       Force Initialization
-- --version-prefix  Version Prefix []
-- --feature-prefix  Feature Branch Prefix [feature/]
-- --hotfix-prefix   Hotfix Branch Prefix [hotfix/]
-- --release-prefix  Release Branch Prefix [release/]
-- --working-branch  Working Branch [master]
+    -d, --defaults             Initialize with all default options
+    -f, --force                Force Initialization
+    --version-prefix {prefix}  Version Prefix []
+    --feature-prefix {prefix}  Feature Branch Prefix [feature/]
+    --hotfix-prefix {prefix}   Hotfix Branch Prefix [hotfix/]
+    --release-prefix {prefix}  Release Branch Prefix [release/]
+    --working-branch {prefix}  Working Branch [master]
 
 **hotfix**
 
 Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
-- start {version} {hotfix-name}
-- finish [-n] {version} {hotfix-name} {new-version}
+    start {version} {hotfix-name}
+    finish [-n] {version} {hotfix-name} {new-version}
 
--n or --no-commit can be based to prevent the hotfix from being merged back into the working branch
+    -n, --no-merge    Do not merge hotfix back to master
+
+`--no-merge` would be useful when hot-fixing an LTS version
 
 **feature**
 
 Work with features. Features are used to implement new functionality.
 
-- start {feature-name}
-- finish {feature-name}
+    start {feature-name}
+    finish {feature-name}
 
 
 **release**
 
 Work with releases. Releases are used to mark specific versions.
 
-- start {version}
-- end {version}
+    start {version}
+    end {version}
 
 
 ##Example

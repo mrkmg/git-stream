@@ -48,6 +48,10 @@ git_working_dir_clean() {
     fi
 }
 
+git_list_branches() {
+    git for-each-ref --format='%(refname:short)' refs/heads/
+}
+
 do_git() {
     git "$@" >/dev/null 2>&1
     return $?

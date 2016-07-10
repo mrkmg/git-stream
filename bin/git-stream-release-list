@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+gitstream_release_list() {
+     gitstream_environment
+
+    if [ $# -gt 0 ]; then
+        usage; exit 1;
+    fi
+
+    git_list_branches | grep "^${RELEASE_PREFIX}" | sed "s/${RELEASE_PREFIX/\//\\/}//"
+}
