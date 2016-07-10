@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 gitstream_feature_list() {
-    gitstream_environment
-
     if [ $# -gt 0 ]; then
         usage; exit 1;
     fi
+
     git_list_branches | grep "^${FEATURE_PREFIX}" | sed "s/${FEATURE_PREFIX/\//\\/}//"
 }

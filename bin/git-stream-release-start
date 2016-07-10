@@ -3,8 +3,6 @@
 gitstream_release_start() {
     local version prefixedVersion branch
 
-    gitstream_environment
-
     if [ $# -ne 1 ]; then
         usage; exit 1;
     fi

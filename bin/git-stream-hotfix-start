@@ -3,8 +3,6 @@
 gitstream_hotfix_start() {
     local version hotfix source_tag branch
 
-    gitstream_environment
-
     if [ $# -ne 2 ]; then
         usage; exit 1;
     fi

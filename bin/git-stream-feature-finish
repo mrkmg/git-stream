@@ -3,8 +3,6 @@
 gitstream_feature_finish() {
     local feature branch
 
-    gitstream_environment
-
     if [ $# -ne 1 ]; then
         usage; exit 1;
     fi

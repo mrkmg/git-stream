@@ -5,8 +5,6 @@ gitstream_hotfix_finish() {
 
     merge=1
 
-    gitstream_environment
-
     if [ $# -lt 3 ]; then
         usage; exit 1;
     fi

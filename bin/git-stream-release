@@ -11,6 +11,8 @@ usage() {
 }
 
 gitstream_release() {
+    gitstream_environment
+
     if [ "$#" -lt 1 ]; then
         usage; exit 1
     fi

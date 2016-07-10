@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 gitstream_release_list() {
-     gitstream_environment
-
     if [ $# -gt 0 ]; then
         usage; exit 1;
     fi

@@ -52,19 +52,16 @@ teardown() {
     git rev-parse "1.0.1" >/dev/null 2>&1                   #Added Tag
     ! git rev-parse "hotfix/1.0.0-hotfix1" >/dev/null 2>&1  #Removed hotfix branch
     [ "$(git_current_branch)" == "master" ]                 #Changed to master
-    [ "$(cat file1 | tail -n 1)" != "New" ]                 #Merged hotfixed changes
+    [ "$(cat file1 | tail -n 1)" != "New" ]                 #Didn't merged hotfixed changes
 }
 
 @test "HOTFIX: list" {
     run populate_example_branches
 
-    release_branches=$(git stream hotfix list)
+    hotfix_branches=$(git stream hotfix list)
     expected_branches="$(echo -e "0.0.0-hotfix1\n0.0.0-hotfix2")"
 
     git branch
 
-    echo ${release_branches}
-#    echo ${expected_branches}
-
-    [ "${release_branches}" == "${expected_branches}" ]
+    [ "${hotfix_branches}" == "${expected_branches}" ]
 }

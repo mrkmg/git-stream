@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 gitstream_hotfix_list() {
-     gitstream_environment
-
     if [ $# -gt 0 ]; then
         usage; exit 1;
     fi
