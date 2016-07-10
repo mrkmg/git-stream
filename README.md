@@ -48,6 +48,7 @@ Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
     start {version} {hotfix-name}
     finish [-n] {version} {hotfix-name} {new-version}
+    list
 
     -n, --no-merge    Do not merge hotfix back to master
 
@@ -59,6 +60,7 @@ Work with features. Features are used to implement new functionality.
 
     start {feature-name}
     finish {feature-name}
+    list
 
 
 **release**
@@ -67,6 +69,7 @@ Work with releases. Releases are used to mark specific versions.
 
     start {version}
     end {version}
+    list
 
 
 ##Example
