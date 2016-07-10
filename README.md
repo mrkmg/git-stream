@@ -12,15 +12,25 @@ Git Stream is still very new, with minimal testing by a single person so far. Wh
 
 ##Installation
 
-Clone the repo and run make install
+Installation should be easy, and compatible with any platform which has bash and git installed.
 
-    git clone https://github.com/mrkmg/git-stream.git
-    cd git-stream
+Basic Procedure
+
+- Clone Repo Somewhere
+- Checkout the latest version
+- Test on your platform. If you encounter a failing test, please report it as an issue
+- Install
+
+
+    git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
+    cd /tmp/git-stream
+    git checkout 0.2.0
+    make test
     sudo make install
 
 By default, git-stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can change the prefix. for example:
 
-    PREFIX=/usr sudo make install
+    sudo make install PREFIX=/usr
 
 ##Usage
 
