@@ -2,6 +2,7 @@
 
 load ../helpers/make-test-repo
 load ../helpers/git-current-branch
+load ../helpers/populate-example-branches
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -36,4 +37,13 @@ teardown() {
     ! git rev-parse "feature/feature1" >/dev/null 2>&1      #Removed Branch
     [ "$(git_current_branch)" == "master" ]                 #Put back on master
     [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged change
+}
+
+@test "FEATURE: list" {
+    run populate_example_branches
+
+    feature_branches=$(git stream feature list)
+    expected_branches="$(echo -e "feature1\nfeature2")"
+
+    [ "${feature_branches}" == "${expected_branches}" ]
 }

@@ -2,6 +2,7 @@
 
 load ../helpers/make-test-repo
 load ../helpers/git-current-branch
+load ../helpers/populate-example-branches
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -26,7 +27,7 @@ teardown() {
     git rev-parse "release/1.0.0" >/dev/null 2>&1
 }
 
-@test "FEATURE: finish" {
+@test "RELEASE: finish" {
     run git stream release start 1.0.0
     echo "New" >> file1
     run git add file1
@@ -37,4 +38,18 @@ teardown() {
     ! git rev-parse "release/1.0.0" >/dev/null 2>&1         #Removed release branch
     [ "$(git_current_branch)" == "master" ]                 #Changed to master
     [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged release changes
+}
+
+@test "RELEASE: list" {
+    run populate_example_branches
+
+    release_branches=$(git stream release list)
+    expected_branches="$(echo -e "0.0.1\n0.0.2")"
+
+    git branch
+
+    echo ${release_branches}
+#    echo ${expected_branches}
+
+    [ "${release_branches}" == "${expected_branches}" ]
 }
