@@ -58,7 +58,7 @@ Initialize Git Stream on the current project.
 Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
     start {version} {hotfix-name}
-    finish [-l | -m {message} | -n] {version} {hotfix-name} {new-version}
+    finish [-l | -m {message} | -n] {versioned-hotfix-name} {new-version}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
@@ -153,7 +153,7 @@ To make that fix, you start the hotfix.
 
 This will create a branch named "hotfix/1.1.0-security-flaw-bug" forked from the tag 1.1.0. Fix the bug and then finish the hotfix, and implementing it in 1.1.1.
 
-    git stream hotfix finish 1.1.0 security-flaw-bug 1.1.1
+    git stream hotfix finish 1.1.0-security-flaw-bug 1.1.1
 
 This will tag your current hotfix branch as 1.1.1 and then rebase master with the fix.
 

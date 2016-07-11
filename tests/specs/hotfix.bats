@@ -33,7 +33,7 @@ teardown() {
 @test "HOTFIX: finish and merge" {
     git stream --debug hotfix start 1.0.0 hotfix1
     make_change Hotfix
-    git stream --debug hotfix finish 1.0.0 hotfix1 1.0.1
+    git stream --debug hotfix finish 1.0.0-hotfix1 1.0.1
 
     git rev-parse "1.0.1"                       #Added Tag
     ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
@@ -44,7 +44,7 @@ teardown() {
 @test "HOTFIX: finish and merge message" {
     git stream --debug hotfix start 1.0.0 hotfix1
     make_change Hotfix
-    git stream --debug hotfix finish -m "Merge Message" 1.0.0 hotfix1 1.0.1
+    git stream --debug hotfix finish -m "Merge Message" 1.0.0-hotfix1 1.0.1
 
     [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
 }
@@ -52,7 +52,7 @@ teardown() {
 @test "HOTFIX: finish and skip merge" {
     git stream --debug hotfix start 1.0.0 hotfix1
     make_change Hotfix
-    git stream --debug hotfix finish -l 1.0.0 hotfix1 1.0.1
+    git stream --debug hotfix finish -l 1.0.0-hotfix1 1.0.1
 
     git rev-parse "1.0.1"                       #Added Tag
     ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch

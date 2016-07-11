@@ -19,7 +19,6 @@ usage() {
 
 version() {
     echo "Git Stream 0.3.0"
-    echo
 }
 
 git_current_branch () {
@@ -223,7 +222,7 @@ main() {
         "-h"|"--help")
             usage; exit 0
             ;;
-        "-v"|"--version")
+        "-v"|"--version"|"version")
             version; exit 0
             ;;
     esac

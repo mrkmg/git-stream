@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 
 gitstream_hotfix_finish() {
-    local version hotfix new_version prefixed_version new_prefixed_version branch merge_args
+    local hotfix new_version prefixed_version new_prefixed_version branch merge_args
 
     merge=1
 
-    if [ $# -lt 3 ]; then
+    if [ $# -lt 2 ]; then
         usage; exit 1;
     fi
 
-    version="$1"
-    hotfix="$2"
-    new_version="$3"
-    prefixed_version="${VERSION_PREFIX}${version}"
+    hotfix="$1"
+    new_version="$2"
     new_prefixed_version="${VERSION_PREFIX}${new_version}"
-    branch="${HOTFIX_PREFIX}${version}-${hotfix}"
+    branch="${HOTFIX_PREFIX}${hotfix}"
 
     if git_rev_exists ${new_prefixed_version}; then
         print_error "The tag ${new_prefixed_version} already exists."

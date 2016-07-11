@@ -6,7 +6,7 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {version} {hotfix-name}"
-    echo "finish [-l | -m {message} | -n] {version} {hotfix-name} {new-version}"
+    echo "finish [-l | -m {message} | -n] {versioned-hotfix-name} {new-version}"
     echo "list"
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
