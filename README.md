@@ -2,13 +2,13 @@
 
 [![Build Status](https://travis-ci.org/mrkmg/git-stream.svg?branch=master)](https://travis-ci.org/mrkmg/git-stream)
 
-Git Stream is a branching model inspired by [git-flow](https://github.com/nvie/gitflow). I really enjoy what git-flow offers, but the multiple primary branches, the multiple branches which do the same thing (feature/support/bugfix), and dealing with pull requests always kind of bugged me. After reading this [blog](http://endoflineblog.com/gitflow-considered-harmful) I decided I would build my own "git-flow".
+Git Stream is a branching model inspired by [git-flow](https://github.com/nvie/gitflow). I really enjoy what git-flow offers, but the multiple primary branches, duplicated functionality (feature/support/bugfix), and dealing with pull requests always kind of bugged me. After reading this [blog](http://endoflineblog.com/gitflow-considered-harmful) I decided I would build my own "git-flow".
 
 The name "Git Stream" was chosen as this plugin should streamline some of the repetitious actions in git.
 
 ####Warning
 
-Git Stream is still very new, with minimal testing by a single person so far. While I am open to suggestions, bug reports, etc know that this project is a long ways away from being ready for real use. As the project matures, this warning will be updated.
+Git Stream is still very new, with minimal testing by a single person so far. While I am open to suggestions, bug reports, etc, know that this project is a long ways away from being ready for real use. As the project matures, this warning will be updated.
 
 ##Installation
 
@@ -79,8 +79,6 @@ Work with features. Features are used to implement new functionality.
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
 
-
-
 **release**
 
 Work with releases. Releases are used to mark specific versions.
@@ -91,7 +89,6 @@ Work with releases. Releases are used to mark specific versions.
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
-
 
 ##Example
 
@@ -122,7 +119,7 @@ After you finish writing the new feature, go ahead and finish up the feature.
 
     git stream feature finish new-feature
 
-If you run into the message `Failed to merge feature/new-feature into master. Rebase Needed`, that means you can not simply merge the feature into master as master has been changed. This can often happen if multiple features are being finished. The fix is very easy. Rebase master into your new feature branch.
+If you run into the message `Failed to merge feature/new-feature into master.`, that means you can not simply merge the feature into master as master has been changed. This can often happen if multiple features are being finished. The fix is very easy. Rebase master into your new feature branch.
 
 While on the feature/new-feature branch, run the following commands:
 
