@@ -208,11 +208,12 @@ __git_stream_release_list ()
     local expl
     declare -a releases
 
-    releases=(${${(f)"$(_call_program features git stream release list 2> /dev/null)"}})
+    releases=(${${(f)"$(_call_program releases git stream release list 2> /dev/null)"}})
     __git_command_successful || return
 
     _wanted releases expl 'release' compadd $releases
 }
+
 
 __git_stream_hotfix_list ()
 {
