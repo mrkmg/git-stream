@@ -25,7 +25,7 @@ Example Installation on Linux
 
     git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
     cd /tmp/git-stream
-    git checkout 0.2.0
+    git checkout 0.3.0
     make test
     sudo make install
 
