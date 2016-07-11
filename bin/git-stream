@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+GITSTREAM_DEBUG=0
 WORKING_DIR=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
 
 usage() {
@@ -53,7 +54,11 @@ git_list_branches() {
 }
 
 do_git() {
-    git "$@" >/dev/null 2>&1
+    if [ ${GITSTREAM_DEBUG} -eq 1 ]; then
+        echo git "$@" >&2
+    fi
+
+    eval git $@
     return $?
 }
 
@@ -78,8 +83,103 @@ gitstream_environment() {
     WORKING_BRANCH=$(git config gitstream.branch.working)
 }
 
+gitstream_make_branch() {
+    local source_branch dest_branch
+
+    if [ $# -ne 2 ]; then
+        print_error "Wrong number of arguments for gitstream_make_branch"
+        bug_error_message
+        exit 1
+    fi
+
+    source_branch="$1"
+    dest_branch="$2"
+
+    if ! git_working_dir_clean; then
+        print_error "Working directory not clean"
+        exit 1
+    fi
+
+    if ! git_rev_exists ${source_branch}; then
+        print_error "${source_branch} does not exist"
+        exit 1
+    fi
+
+    if git_rev_exists ${dest_branch}; then
+        print_error "${dest_branch} already exists"
+        exit 1
+    fi
+
+    if ! do_git branch "${dest_branch}" "${source_branch}"; then
+        print_error "Failed to create branch ${dest_branch} from ${source_branch}"
+        bug_error_message
+        exit 1
+    fi
+
+    if ! do_git checkout "${dest_branch}"; then
+        print_error "Failed to checkout ${dest_branch}"
+        bug_error_message
+        exit 1
+    fi
+}
+
+gitstream_checkout_branch() {
+    if [ $# -ne 1 ]; then
+        print_error "Wrong number of arguments for gitstream_checkout_branch"
+        bug_error_message
+        exit 1
+    fi
+
+    if ! git_working_dir_clean; then
+        print_error "Working directory not clean"
+        exit 1
+    fi
+
+    if ! do_git checkout "$1"; then
+        print_error "Failed to checkout $1"
+        exit 1
+    fi
+}
+
+gitstream_merge() {
+    local source_branch dest_branch args
+
+    if [ $# -lt 2 ]; then
+        print_error "Wrong number of arguments for gitstream_merge"
+        bug_error_message
+    fi
+
+    source_branch=$1; shift
+    dest_branch=$1; shift
+
+    if [ $# -ne 0 ]; then
+        args=$@
+    fi
+
+    if ! git_rev_exists ${source_branch}; then
+        print_error "Branch ${source_branch} does not exist"
+        exit 1
+    fi
+
+    if ! git_rev_exists ${dest_branch}; then
+        print_error "Branch ${dest_branch} does not exist"
+        exit 1
+    fi
+
+    gitstream_checkout_branch ${dest_branch}
+
+    if ! do_git merge ${args} ${source_branch}; then
+        do_git merge --abort
+        do_git checkout ${source_branch}
+        print_error "Failed to merge ${source_branch} into ${dest_branch}."
+        print_error
+        print_error "Either the merge was cancelled or a rebase/merge of ${source_branch} is needed."
+        exit 1
+    fi
+}
+
 gitstream_source() {
-    local command commandType file func
+    local command command_type file func
 
     command="$1"
     file="${WORKING_DIR}/git-stream-${command}"
@@ -91,9 +191,9 @@ gitstream_source() {
 
     source ${file}
 
-    commandType=$(type ${func} | head -n 1)
+    command_type=$(type ${func} | head -n 1)
 
-    if [ "${commandType}" != "${func} is a function" ]; then
+    if [ "${command_type}" != "${func} is a function" ]; then
         usage; exit 1
     fi
 }
@@ -113,9 +213,13 @@ main() {
         usage; exit 1
     fi
 
-    local subCommand="$1"; shift
+    if [ "$1" == "--debug" ]; then
+        GITSTREAM_DEBUG=1; shift
+    fi
 
-    case ${subCommand} in
+    local sub_command="$1"; shift
+
+    case ${sub_command} in
         "-h"|"--help")
             usage; exit 0
             ;;
@@ -124,9 +228,9 @@ main() {
             ;;
     esac
 
-    gitstream_source "${subCommand}"
+    gitstream_source "${sub_command}"
 
-    gitstream_${subCommand} "$@"
+    gitstream_${sub_command} "$@"
 }
 
 main "$@"

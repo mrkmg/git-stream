@@ -3,10 +3,6 @@
 gitstream_feature_start() {
     local feature branch
 
-    if [ $# -ne 1 ]; then
-        usage; exit 1;
-    fi
-
     feature="$1"
     branch="${FEATURE_PREFIX}${feature}"
 
@@ -15,17 +11,7 @@ gitstream_feature_start() {
         exit 1
     fi
 
-    if [ "$(git_current_branch)" != "${WORKING_BRANCH}" ]; then
-        print_error "You are not currently on ${WORKING_BRANCH}"
-        exit 1
-    fi
-
-    if ! git_working_dir_clean; then
-        print_error "Working directory not clean"
-        exit 1
-    fi
-
-    do_git checkout -b "${branch}"
+    gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
 
     echo
     echo "Your are now on ${branch}. When you are done with the feature, run git stream finish feature ${feature}"

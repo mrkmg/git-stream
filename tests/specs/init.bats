@@ -19,7 +19,7 @@ teardown() {
 }
 
 @test "INIT: default options" {
-    git stream init -d
+    git stream --debug init -d
 
     [ "$(git config gitstream.branch.working)" == "master" ]
     [ "$(git config gitstream.prefix.feature)" == "feature/" ]
@@ -29,7 +29,7 @@ teardown() {
 }
 
 @test "INIT: cli options" {
-    git stream init --version-prefix "c_v" --feature-prefix "c_f"  --hotfix-prefix "c_h"  --release-prefix "c_r" --working-branch "c_w"
+    git stream --debug init --version-prefix "c_v" --feature-prefix "c_f"  --hotfix-prefix "c_h"  --release-prefix "c_r" --working-branch "c_w"
 
     [ "$(git config gitstream.branch.working)" == "c_w" ]
     [ "$(git config gitstream.prefix.feature)" == "c_f" ]
@@ -45,7 +45,7 @@ teardown() {
         echo "i_h"
         echo "i_r"
         echo "i_w"
-    ) | git stream init
+    ) | git stream --debug init
 
     [ "$(git config gitstream.branch.working)" == "i_w" ]
     [ "$(git config gitstream.prefix.feature)" == "i_f" ]

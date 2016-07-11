@@ -6,29 +6,56 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {version} {hotfix-name}"
-    echo "finish [-n] {version} {hotfix-name} {new-version}"
+    echo "finish [-l | -m {message} | -n] {version} {hotfix-name} {new-version}"
     echo "list"
     echo
-    echo "-n, --no-merge    Do not merge hotfix back to master"
+    echo "-m, --message {message}   A message for the merge (Implies -n)"
+    echo "-n, --no-ff               Force a non fast-forward merge"
+    echo "-l, --leave               Do not merge the hotfix back into the working branch"
 }
 
 gitstream_hotfix() {
+    local sub_command
+
     gitstream_environment
 
     if [ "$#" -lt 1 ]; then
         usage; exit 1
     fi
 
-    local subCommand="$1"; shift
+    sub_command="$1"; shift
 
-    case ${subCommand} in
+    case ${sub_command} in
         "-h"|"--help")
             usage; exit 0
             ;;
     esac
 
+    GITSTREAM_HOTFIX_MESSAGE=""
+    GITSTREAM_HOTFIX_NOFF=0
+    GITSTREAM_HOTFIX_MERGE=1
 
-    gitstream_source "hotfix-${subCommand}"
+    while arg=$1 && [ "${arg:0:1}" == "-" ]; do
+        case ${arg} in
+            "-m"|"--message")
+                shift
+                GITSTREAM_HOTFIX_MESSAGE="$(printf "%q" "$1")"; shift
+                ;;
+            "-n"|"--no-ff")
+                shift
+                GITSTREAM_HOTFIX_NOFF=1;
+                ;;
+            "-l"|"--leave")
+                shift
+                GITSTREAM_HOTFIX_MERGE=0;
+                ;;
+            *)
+                usage; exit 1
+                ;;
+        esac
+    done
 
-    gitstream_hotfix_${subCommand} "$@"
+    gitstream_source "hotfix-${sub_command}"
+
+    gitstream_hotfix_${sub_command} "$@"
 }

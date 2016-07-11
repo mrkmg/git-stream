@@ -6,26 +6,50 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {version}"
-    echo "finish {version}"
+    echo "finish [-m {message} | -n]  {version}"
     echo "list"
+    echo
+    echo "-m, --message {message}   A message for the merge (Implies -n)"
+    echo "-n, --no-ff               Force a non fast-forward merge"
 }
 
 gitstream_release() {
+    local sub_command
+
     gitstream_environment
 
     if [ "$#" -lt 1 ]; then
         usage; exit 1
     fi
 
-    local subCommand="$1"; shift
+    sub_command="$1"; shift
 
-    case ${subCommand} in
+    case ${sub_command} in
         "-h"|"--help")
             usage; exit 0
             ;;
     esac
 
-    gitstream_source "release-${subCommand}"
+    GITSTREAM_RELEASE_MESSAGE=""
+    GITSTREAM_RELEASE_NOFF=0
 
-    gitstream_release_${subCommand} "$@"
+    while arg=$1 && [ "${arg:0:1}" == "-" ]; do
+        case ${arg} in
+            "-m"|"--message")
+                shift
+                GITSTREAM_RELEASE_MESSAGE="$(printf "%q" "$1")"; shift
+                ;;
+            "-n"|"--no-ff")
+                shift
+                GITSTREAM_RELEASE_NOFF=1;
+                ;;
+            *)
+                usage; exit 1
+                ;;
+        esac
+    done
+
+    gitstream_source "release-${sub_command}"
+
+    gitstream_release_${sub_command} "$@"
 }

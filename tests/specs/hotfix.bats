@@ -3,6 +3,7 @@
 load ../helpers/make-test-repo
 load ../helpers/git-current-branch
 load ../helpers/populate-example-branches
+load ../helpers/make-change
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -13,9 +14,9 @@ setup() {
     rm -rf ${TESTING_PATH}
     make_test_repo ${TESTING_PATH}
     cd ${TESTING_PATH}
-    git stream init -d >/dev/null
-    git stream release start 1.0.0
-    git stream release finish 1.0.0
+    git stream --debug init -d >/dev/null
+    git stream --debug release start 1.0.0
+    git stream --debug release finish 1.0.0
 }
 
 teardown() {
@@ -24,41 +25,45 @@ teardown() {
 }
 
 @test "HOTFIX: start" {
-    run git stream hotfix start 1.0.0 hotfix1
+    git stream --debug hotfix start 1.0.0 hotfix1
 
-    git rev-parse "hotfix/1.0.0-hotfix1" >/dev/null 2>&1
+    git rev-parse "hotfix/1.0.0-hotfix1"
 }
 
 @test "HOTFIX: finish and merge" {
-    run git stream hotfix start 1.0.0 hotfix1
-    echo "New" >> file1
-    run git add file1
-    run git commit -m "Hotfix"
-    run git stream hotfix finish 1.0.0 hotfix1 1.0.1
+    git stream --debug hotfix start 1.0.0 hotfix1
+    make_change Hotfix
+    git stream --debug hotfix finish 1.0.0 hotfix1 1.0.1
 
-    git rev-parse "1.0.1" >/dev/null 2>&1                   #Added Tag
-    ! git rev-parse "hotfix/1.0.0-hotfix1" >/dev/null 2>&1  #Removed hotfix branch
-    [ "$(git_current_branch)" == "master" ]                 #Changed to master
-    [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged hotfixed changes
+    git rev-parse "1.0.1"                       #Added Tag
+    ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]     #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged hotfixed changes
+}
+
+@test "HOTFIX: finish and merge message" {
+    git stream --debug hotfix start 1.0.0 hotfix1
+    make_change Hotfix
+    git stream --debug hotfix finish -m "Merge Message" 1.0.0 hotfix1 1.0.1
+
+    [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
 }
 
 @test "HOTFIX: finish and skip merge" {
-    run git stream hotfix start 1.0.0 hotfix1
-    echo "New" >> file1
-    run git add file1
-    run git commit -m "Hotfix"
-    run git stream hotfix finish -n 1.0.0 hotfix1 1.0.1
+    git stream --debug hotfix start 1.0.0 hotfix1
+    make_change Hotfix
+    git stream --debug hotfix finish -l 1.0.0 hotfix1 1.0.1
 
-    git rev-parse "1.0.1" >/dev/null 2>&1                   #Added Tag
-    ! git rev-parse "hotfix/1.0.0-hotfix1" >/dev/null 2>&1  #Removed hotfix branch
-    [ "$(git_current_branch)" == "master" ]                 #Changed to master
-    [ "$(cat file1 | tail -n 1)" != "New" ]                 #Didn't merged hotfixed changes
+    git rev-parse "1.0.1"                       #Added Tag
+    ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]     #Changed to master
+    [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merged hotfixed changes
 }
 
 @test "HOTFIX: list" {
-    run populate_example_branches
+    populate_example_branches
 
-    hotfix_branches=$(git stream hotfix list)
+    hotfix_branches=$(git stream --debug hotfix list)
     expected_branches="$(echo -e "0.0.0-hotfix1\n0.0.0-hotfix2")"
 
     git branch

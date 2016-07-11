@@ -1,36 +1,27 @@
 #!/usr/bin/env bash
 
 gitstream_release_start() {
-    local version prefixedVersion branch
+    local version prefixed_version branch
 
     if [ $# -ne 1 ]; then
         usage; exit 1;
     fi
 
     version="$1"
-    prefixedVersion="${VERSION_PREFIX}${version}"
-    branch="${RELEASE_PREFIX}${prefixedVersion}"
+    prefixed_version="${VERSION_PREFIX}${version}"
+    branch="${RELEASE_PREFIX}${prefixed_version}"
+
+    if git_rev_exists "${prefixed_version}"; then
+        print_error "Tag ${prefixed_version} already exists"
+        exit 1
+    fi
 
     if git_rev_exists ${branch}; then
         print_error "Branch ${branch} already exists"
         exit 1
     fi
 
-    if [ "$(git_current_branch)" != "${WORKING_BRANCH}" ]; then
-        print_error "You are not currently on ${WORKING_BRANCH}"
-        exit 1
-    fi
-
-    if ! git_working_dir_clean; then
-        print_error "Working directory not clean"
-        exit 1
-    fi
-
-    if ! do_git checkout -b "${branch}"; then
-        print_error "Failed to create the new branch ${branch}."
-        bug_error_message
-        exit 1
-    fi
+    gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
 
     echo
     echo "Your are now on ${branch}. When you are done with the release, run git stream finish release ${version}"

@@ -58,20 +58,27 @@ Initialize Git Stream on the current project.
 Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
     start {version} {hotfix-name}
-    finish [-n] {version} {hotfix-name} {new-version}
+    finish [-l | -m {message} | -n] {version} {hotfix-name} {new-version}
     list
 
-    -n, --no-merge    Do not merge hotfix back to master
+    -m, --message {message}   A message for the merge (Implies -n)
+    -n, --no-ff               Force a non fast-forward merge
+    -l, --leave               Do not merge the hotfix back into the working branch
 
-`--no-merge` would be useful when hot-fixing an LTS version
+
+`-l/--leave` is useful when hot-fixing an LTS version which is no longer relevant to the working branch
 
 **feature**
 
 Work with features. Features are used to implement new functionality.
 
     start {feature-name}
-    finish {feature-name}
+    finish [-m {message}] [-n] {feature-name}
     list
+
+    -m, --message {message}   A message for the merge (Implies -n)
+    -n, --no-ff               Force a non fast-forward merge
+
 
 
 **release**
@@ -79,8 +86,11 @@ Work with features. Features are used to implement new functionality.
 Work with releases. Releases are used to mark specific versions.
 
     start {version}
-    end {version}
+    finish [-m {message}] [-n] {version}
     list
+
+    -m, --message {message}   A message for the merge (Implies -n)
+    -n, --no-ff               Force a non fast-forward merge
 
 
 ##Example
@@ -155,6 +165,10 @@ If the output is "Hot Fix security-flaw-bug failed to be merged into master. Ple
     git merge 1.1.1
 
 Make the proper corrections, stage them, then make a commit.
+
+###Recommendations
+
+If you
 
 ###Other Notes
 

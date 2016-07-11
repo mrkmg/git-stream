@@ -3,6 +3,7 @@
 load ../helpers/make-test-repo
 load ../helpers/git-current-branch
 load ../helpers/populate-example-branches
+load ../helpers/make-change
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -13,7 +14,7 @@ setup() {
     rm -rf ${TESTING_PATH}
     make_test_repo ${TESTING_PATH}
     cd ${TESTING_PATH}
-    git stream init -d >/dev/null
+    git stream --debug init -d >/dev/null
 }
 
 teardown() {
@@ -22,27 +23,33 @@ teardown() {
 }
 
 @test "FEATURE: start" {
-    run git stream feature start feature1
+    git stream --debug feature start feature1
 
-    git rev-parse "feature/feature1" >/dev/null 2>&1
+    git rev-parse "feature/feature1"
 }
 
 @test "FEATURE: finish" {
-    run git stream feature start feature1
-    echo "New" >> file1
-    run git add file1
-    run git commit -m feature1
-    run git stream feature finish feature1
+    git stream --debug feature start feature1
+    make_change feature1
+    git stream --debug feature finish feature1
 
-    ! git rev-parse "feature/feature1" >/dev/null 2>&1      #Removed Branch
+    ! git rev-parse "feature/feature1"      #Removed Branch
     [ "$(git_current_branch)" == "master" ]                 #Put back on master
     [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged change
 }
 
-@test "FEATURE: list" {
-    run populate_example_branches
+@test "FEATURE: finish message" {
+    git stream --debug feature start feature1
+    make_change feature1
+    git stream --debug feature finish -m "Merge Message" feature1
 
-    feature_branches=$(git stream feature list)
+    [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
+}
+
+@test "FEATURE: list" {
+    populate_example_branches
+
+    feature_branches=$(git stream --debug feature list)
     expected_branches="$(echo -e "feature1\nfeature2")"
 
     [ "${feature_branches}" == "${expected_branches}" ]

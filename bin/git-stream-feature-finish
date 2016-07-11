@@ -1,36 +1,21 @@
 #!/usr/bin/env bash
 
 gitstream_feature_finish() {
-    local feature branch
+    local feature branch merge_args
 
-    if [ $# -ne 1 ]; then
-        usage; exit 1;
-    fi
-
+    merge_args=""
     feature="$1"
     branch="${FEATURE_PREFIX}${feature}"
 
-    if ! git_rev_exists ${branch}; then
-        print_error "Branch ${branch} does not exist"
-        exit 1
+    if [ ${GITSTREAM_FEATURE_NOFF} -eq 1 ] || [ ${#GITSTREAM_FEATURE_MESSAGE} -gt 0 ]; then
+        merge_args="${merge_args} --no-ff"
     fi
 
-    if ! git_working_dir_clean; then
-        print_error "Working directory not clean"
-        exit 1
+    if [ ${#GITSTREAM_FEATURE_MESSAGE} -gt 0 ]; then
+        merge_args="${merge_args} -m ${GITSTREAM_FEATURE_MESSAGE}"
     fi
 
-    if ! do_git checkout ${WORKING_BRANCH}; then
-        print_error "Failed to checkout ${WORKING_BRANCH}"
-        exit 1
-    fi
-
-    if ! do_git merge ${branch}; then
-        do_git merge --abort
-        do_git checkout ${branch}
-        print_error "Failed to merge ${branch} into ${WORKING_BRANCH}. Rebase Needed"
-        exit 1
-    fi
+    gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
 
     if ! do_git branch -d ${branch}; then
         print_error "Failed to remove ${branch}"

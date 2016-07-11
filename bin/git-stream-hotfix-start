@@ -22,22 +22,7 @@ gitstream_hotfix_start() {
         exit 1
     fi
 
-    if ! git_working_dir_clean; then
-        print_error "Working directory not clean"
-        exit 1
-    fi
-
-    if ! do_git branch "${branch}" "${source_tag}"; then
-        print_error "Failed to create branch ${branch} from ${source_tag}"
-        bug_error_message
-        exit 1
-    fi
-
-    if ! do_git checkout "${branch}"; then
-        print_error "Failed to checkout ${branch}"
-        bug_error_message
-        exit 1
-    fi
+    gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
 
     echo
     echo "Your are now on ${branch}. When you are done with the hotfix, run git stream hotfix ${version} ${hotfix}"

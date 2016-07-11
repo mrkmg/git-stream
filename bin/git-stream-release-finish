@@ -1,50 +1,38 @@
 #!/usr/bin/env bash
 
 gitstream_release_finish() {
-    local version prefixedVersion branch
+    local version prefixed_version branch merge_args
 
     if [ $# -ne 1 ]; then
         usage; exit 1;
     fi
 
     version="$1"
-    prefixedVersion="${VERSION_PREFIX}${version}"
-    branch="${RELEASE_PREFIX}${prefixedVersion}"
+    prefixed_version="${VERSION_PREFIX}${version}"
+    branch="${RELEASE_PREFIX}${prefixed_version}"
 
-    if git_rev_exists ${prefixedVersion}; then
-        print_error echo "Tag ${prefixedVersion} already exists"
+    if git_rev_exists ${prefixed_version}; then
+        print_error echo "Tag ${prefixed_version} already exists"
         exit 1
     fi
 
-    if ! git_rev_exists ${branch}; then
-        print_error echo "Branch ${branch} does not exist"
-        exit 1
+    if [ ${GITSTREAM_RELEASE_NOFF} -eq 1 ] || [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
+        merge_args="${merge_args} --no-ff"
     fi
 
-    if ! git_working_dir_clean; then
-        print_error echo "Working directory not clean"
-        exit 1
+    if [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
+        merge_args="${merge_args} -m ${GITSTREAM_RELEASE_MESSAGE}"
     fi
 
-    if ! do_git checkout ${WORKING_BRANCH}; then
-        print_error echo "Failed to checkout ${WORKING_BRANCH}"
-        exit 1
-    fi
-
-    if ! do_git merge ${branch}; then
-        print_error echo "Failed to merge ${branch} into ${WORKING_BRANCH}. Could not auto-merge."
-        do_git merge --abort
-        do_git checkout ${branch}
-        exit 1
-    fi
-
-    if ! do_git tag ${prefixedVersion}; then
-        print_error echo "Failed to create tag ${prefixedVersion}"
-        exit 1
-    fi
+    gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
 
     if ! do_git branch -d ${branch}; then
         print_error echo "Failed to remove ${branch}"
+        exit 1
+    fi
+
+    if ! do_git tag ${prefixed_version}; then
+        print_error echo "Failed to create tag ${prefixed_version}"
         exit 1
     fi
 
