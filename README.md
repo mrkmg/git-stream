@@ -48,7 +48,7 @@ Example Installation on Linux
     cd /tmp/git-stream
     git submodule init
     git submodule update
-    git checkout 0.3.1
+    git checkout v0.4.0
     make test
     sudo make install
 
