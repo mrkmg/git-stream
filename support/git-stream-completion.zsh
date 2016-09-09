@@ -23,7 +23,7 @@ _git-stream ()
 
             local -a subcommands
             subcommands=(
-                'init:Initialize a new git repo with support for the branching model.'
+                'init:Initialize an existing git repo with Git Stream.'
                 'feature:Manage your feature branches.'
                 'release:Manage your release branches.'
                 'hotfix:Manage your hotfix branches.'
