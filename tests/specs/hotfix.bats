@@ -14,7 +14,7 @@ setup() {
     rm -rf ${TESTING_PATH}
     make_test_repo ${TESTING_PATH}
     cd ${TESTING_PATH}
-    git stream --debug init -d >/dev/null
+    git stream --debug init -d --version-prefix 'v' >/dev/null
     git stream --debug release start 1.0.0
     git stream --debug release finish 1.0.0
 }
@@ -35,7 +35,7 @@ teardown() {
     make_change Hotfix
     git stream --debug hotfix finish 1.0.0-hotfix1 1.0.1
 
-    git rev-parse "1.0.1"                       #Added Tag
+    git rev-parse "v1.0.1"                       #Added Tag
     ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
     [ "$(git_current_branch)" == "master" ]     #Changed to master
     [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged hotfixed changes
@@ -54,7 +54,7 @@ teardown() {
     make_change Hotfix
     git stream --debug hotfix finish -l 1.0.0-hotfix1 1.0.1
 
-    git rev-parse "1.0.1"                       #Added Tag
+    git rev-parse "v1.0.1"                       #Added Tag
     ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
     [ "$(git_current_branch)" == "master" ]     #Changed to master
     [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merged hotfixed changes

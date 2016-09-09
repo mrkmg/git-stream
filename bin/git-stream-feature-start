@@ -14,5 +14,5 @@ gitstream_feature_start() {
     gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
 
     echo
-    echo "Your are now on ${branch}. When you are done with the feature, run git stream finish feature ${feature}"
+    echo "Your are now on ${branch}. When you are done with the feature, run git stream feature finish ${feature}"
 }

@@ -14,7 +14,7 @@ setup() {
     rm -rf ${TESTING_PATH}
     make_test_repo ${TESTING_PATH}
     cd ${TESTING_PATH}
-    git stream --debug init -d >/dev/null
+    git stream --debug init -d --version-prefix 'v' >/dev/null
 }
 
 teardown() {

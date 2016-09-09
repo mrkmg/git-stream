@@ -37,7 +37,13 @@ _git-stream ()
 
                 (init)
                 _arguments \
-                    -f'[Force setting of gitstream branches, even if already configured]'
+                    -f'[Force setting of gitstream branches, even if already configured]'\
+                    -d'[Use the default configuration]'\
+                    --version-prefix'[Version Prefix]:version-prefix'\
+                    --feature-prefix'[Feature Prefix]:feature-prefix'\
+                    --release-prefix'[Release Prefix]:release-prefix'\
+                    --hotfix-prefix'[Hotfix Prefix]:hotfix-prefix'\
+                    --working-branch'[Working Branch]:branch:__git_branch_names'
                 ;;
 
                 (hotfix)
@@ -88,8 +94,8 @@ __git-stream-release ()
 
                 (finish)
                     _arguments \
-                        -m'[Use the given tag message]:message'\
-                        -n'[No FF]'\
+                        {-m,--message}'[Use the given tag message]:message'\
+                        {-n,--no-ff}'[No Fast-Forward]'\
                         ':release:__git_stream_release_list'
                 ;;
             esac
@@ -129,8 +135,8 @@ __git-stream-hotfix ()
 
                 (finish)
                     _arguments \
-                        -m'[Use the given tag message]:message'\
-                        -n'[No FF]'\
+                        {-m,--message}'[Use the given tag message]:message'\
+                        {-n,--no-ff}'[No Fast-Forward]'\
                         ':hotfix:__git_stream_version_list'\
                         ':branch-name:__git_stream_hotfix_list'\
                         ':new-version'
@@ -171,8 +177,8 @@ __git-stream-feature ()
 
                 (finish)
                     _arguments \
-                        -m'[Use the given tag message]:message'\
-                        -n'[No FF]'\
+                        {-m,--message}'[Use the given tag message]:message'\
+                        {-n,--no-ff}'[No Fast-Forward]'\
                         ':feature:__git_stream_feature_list'
                 ;;
 

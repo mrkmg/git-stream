@@ -18,7 +18,7 @@ usage() {
     echo "--feature-prefix {prefix}  Feature Branch Prefix [feature/]"
     echo "--hotfix-prefix {prefix}   Hotfix Branch Prefix [hotfix/]"
     echo "--release-prefix {prefix}  Release Branch Prefix [release/]"
-    echo "--working-branch {prefix}  Working Branch [master]"
+    echo "--working-branch {branch}  Working Branch [master]"
 }
 
 unknownOptionMessage() {

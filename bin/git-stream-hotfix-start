@@ -9,7 +9,13 @@ gitstream_hotfix_start() {
 
     version="$1"
     hotfix="$2"
-    source_tag="${VERSION_PREFIX}${version}"
+
+    if [ ${version:0:${#VERSION_PREFIX}} = ${VERSION_PREFIX} ]; then
+        source_tag="${version}"
+    else
+        source_tag="${VERSION_PREFIX}${version}"
+    fi
+
     branch="${HOTFIX_PREFIX}${version}-${hotfix}"
 
     if ! git_rev_exists ${source_tag}; then
@@ -25,5 +31,5 @@ gitstream_hotfix_start() {
     gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
 
     echo
-    echo "Your are now on ${branch}. When you are done with the hotfix, run git stream hotfix ${version} ${hotfix}"
+    echo "Your are now on ${branch}. When you are done with the hotfix, run git stream hotfix finish ${version} ${hotfix}"
 }
