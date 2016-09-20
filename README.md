@@ -111,7 +111,8 @@ Work with releases. Releases are used to mark specific versions.
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
-    -l, --leave               Do not merge the release branch back into the working branch
+    -l, --leave               Do not remove the release branch
+    -d, --no-merge            Do not merge the release branch back into the working branch
 
 ## Example
 
@@ -210,6 +211,11 @@ Make the proper corrections, stage them, then make a commit.
 - Tell your friends about Git Stream, and submit a PR if something is not awesome.
 
 ## Other Notes
+
+For an automated deployment, you may want to checkout the latest release. _If you only use tags for release, you can 
+easily accomplish this with:_
+
+    git checkout $(git describe --abbrev=0 --tags)
 
 If you are working on a long running feature, you may want to occasionally bring the feature branch up to date. This can
 be done via a rebase or merge. If we want to merge, issue the following while on your feature branch:

@@ -96,6 +96,8 @@ __git-stream-release ()
                     _arguments \
                         {-m,--message}'[Use the given tag message]:message'\
                         {-n,--no-ff}'[No Fast-Forward]'\
+                        {-d,--no-merge}'[Do not merge the release branch back into the working branch]'\
+                        {-l,--leave}'[Do not delete the release branch]'\
                         ':release:__git_stream_release_list'
                 ;;
             esac

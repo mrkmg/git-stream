@@ -29,29 +29,31 @@ gitstream_release_finish() {
         exit 1
     fi
 
-    if [ ${GITSTREAM_RELEASE_NOMERGE} -eq 1 ]; then
-        gitstream_checkout_branch "${WORKING_BRANCH}"
+    if [ ${GITSTREAM_RELEASE_NOMERGE} -eq 0 ]; then
+        if [ ${GITSTREAM_RELEASE_NOFF} -eq 1 ] || [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
+            merge_args="${merge_args} --no-ff"
+        fi
+
+        if [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
+            merge_args="${merge_args} -m ${GITSTREAM_RELEASE_MESSAGE}"
+        fi
+
+        gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
 
         echo
-        echo "Release ${version} tag made. The release was not merged in ${WORKING_BRANCH}"
-        exit 0
+        echo "Release ${version} has been merged into ${WORKING_BRANCH} and a tag made"
+    else
+        echo
+        echo "Release ${version} tag made"
     fi
 
-    if [ ${GITSTREAM_RELEASE_NOFF} -eq 1 ] || [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
-        merge_args="${merge_args} --no-ff"
+    if [ ${GITSTREAM_RELEASE_LEAVE} -eq 0 ]; then
+        if ! do_git branch -d ${branch}; then
+            print_error "Failed to remove ${branch}"
+            exit 1
+        fi
     fi
 
-    if [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
-        merge_args="${merge_args} -m ${GITSTREAM_RELEASE_MESSAGE}"
-    fi
+    gitstream_checkout_branch "${WORKING_BRANCH}"
 
-    gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
-
-    if ! do_git branch -d ${branch}; then
-        print_error "Failed to remove ${branch}"
-        exit 1
-    fi
-
-    echo
-    echo "Release ${version} has been merged into ${WORKING_BRANCH} and a tag made"
 }

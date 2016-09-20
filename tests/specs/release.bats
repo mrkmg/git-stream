@@ -50,12 +50,23 @@ teardown() {
 @test "RELEASE: finish no merge" {
     run git stream --debug release start 1.0.0
     make_change Release > /dev/null 2>&1
-    run git stream --debug release finish -l 1.0.0
+    run git stream --debug release finish -d 1.0.0
 
     git rev-parse "v1.0.0" >/dev/null 2>&1      #Added Tag
     ! git rev-parse "release/v1.0.0"            #Removed hotfix branch
     [ "$(git_current_branch)" == "master" ]     #Changed to master
     [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merge release
+}
+
+@test "RELEASE: finish leave" {
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    run git stream --debug release finish -l 1.0.0
+
+    git rev-parse "v1.0.0" >/dev/null 2>&1      #Added Tag
+    git rev-parse "release/v1.0.0"              #Kept hotfix branch
+    [ "$(git_current_branch)" == "master" ]     #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged release changes
 }
 
 @test "RELEASE: list" {
