@@ -47,6 +47,17 @@ teardown() {
     [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
 }
 
+@test "RELEASE: finish no merge" {
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    run git stream --debug release finish -l 1.0.0
+
+    git rev-parse "v1.0.0" >/dev/null 2>&1      #Added Tag
+    ! git rev-parse "release/v1.0.0"            #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]     #Changed to master
+    [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merge release
+}
+
 @test "RELEASE: list" {
     run populate_example_branches
 

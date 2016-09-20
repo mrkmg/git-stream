@@ -18,8 +18,23 @@ gitstream_release_finish() {
     branch="${RELEASE_PREFIX}${prefixed_version}"
 
     if git_rev_exists ${prefixed_version}; then
-        print_error echo "Tag ${prefixed_version} already exists"
+        print_error "Tag ${prefixed_version} already exists"
         exit 1
+    fi
+
+    gitstream_checkout_branch "${WORKING_BRANCH}"
+
+    if ! do_git tag ${prefixed_version}; then
+        print_error "Failed to create tag ${prefixed_version}"
+        exit 1
+    fi
+
+    if [ ${GITSTREAM_RELEASE_NOMERGE} -eq 1 ]; then
+        gitstream_checkout_branch "${WORKING_BRANCH}"
+
+        echo
+        echo "Release ${version} tag made. The release was not merged in ${WORKING_BRANCH}"
+        exit 0
     fi
 
     if [ ${GITSTREAM_RELEASE_NOFF} -eq 1 ] || [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
@@ -33,12 +48,7 @@ gitstream_release_finish() {
     gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
 
     if ! do_git branch -d ${branch}; then
-        print_error echo "Failed to remove ${branch}"
-        exit 1
-    fi
-
-    if ! do_git tag ${prefixed_version}; then
-        print_error echo "Failed to create tag ${prefixed_version}"
+        print_error "Failed to remove ${branch}"
         exit 1
     fi
 

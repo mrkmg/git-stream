@@ -95,7 +95,7 @@ Work with hotfixes. Hotfixes are used to fix a bug in a release.
 Work with features. Features are used to implement new functionality.
 
     start {feature-name}
-    finish [-m {message}] [-n] {feature-name}
+    finish [-m {message} | -n] {feature-name}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
@@ -106,11 +106,12 @@ Work with features. Features are used to implement new functionality.
 Work with releases. Releases are used to mark specific versions.
 
     start {version}
-    finish [-m {message}] [-n] {version}
+    finish [-l | -m {message} | -n] {version}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
+    -l, --leave               Do not merge the release branch back into the working branch
 
 ## Example
 

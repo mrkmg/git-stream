@@ -6,11 +6,12 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {version}"
-    echo "finish [-m {message} | -n]  {version}"
+    echo "finish [-m {message} | -n | -l]  {version}"
     echo "list"
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
     echo "-n, --no-ff               Force a non fast-forward merge"
+    echo "-l, --leave               Do not merge the release branch back into the working branch"
 }
 
 gitstream_release() {
@@ -32,6 +33,7 @@ gitstream_release() {
 
     GITSTREAM_RELEASE_MESSAGE=""
     GITSTREAM_RELEASE_NOFF=0
+    GITSTREAM_RELEASE_NOMERGE=0
 
     while arg=$1 && [ "${arg:0:1}" == "-" ]; do
         case ${arg} in
@@ -41,7 +43,11 @@ gitstream_release() {
                 ;;
             "-n"|"--no-ff")
                 shift
-                GITSTREAM_RELEASE_NOFF=1;
+                GITSTREAM_RELEASE_NOFF=1
+                ;;
+            "-l"|"--leave")
+                shift;
+                GITSTREAM_RELEASE_NOMERGE=1
                 ;;
             *)
                 usage; exit 1
