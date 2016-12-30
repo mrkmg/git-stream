@@ -6,11 +6,12 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {feature-name}"
-    echo "finish [-m {message} | -n] {feature-name}"
+    echo "finish [-l | -m {message} | -n] {feature-name}"
     echo "list"
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
     echo "-n, --no-ff               Force a non fast-forward merge"
+    echo "-l, --leave               Do not delete the feature branch"
 }
 
 gitstream_feature() {
@@ -32,6 +33,7 @@ gitstream_feature() {
 
     GITSTREAM_FEATURE_MESSAGE=""
     GITSTREAM_FEATURE_NOFF=0
+    GITSTREAM_FEATURE_LEAVE=0
 
     while arg=$1 && [ "${arg:0:1}" == "-" ]; do
         case ${arg} in
@@ -41,7 +43,11 @@ gitstream_feature() {
                 ;;
             "-n"|"--no-ff")
                 shift
-                GITSTREAM_HOTFIX_NOFF=1;
+                GITSTREAM_FEATURE_NOFF=1
+                ;;
+            "-l"|"--leave")
+                shift
+                GITSTREAM_FEATURE_LEAVE=1
                 ;;
             *)
                 usage; exit 1

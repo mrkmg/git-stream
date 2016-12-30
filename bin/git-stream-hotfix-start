@@ -18,6 +18,9 @@ gitstream_hotfix_start() {
 
     branch="${HOTFIX_PREFIX}${version}-${hotfix}"
 
+    gitstream_run_hook_die pre hotfix start "${hotfix}" "${branch}" "${WORKING_BRANCH}" "${source_tag}"
+
+
     if ! git_rev_exists ${source_tag}; then
         print_error "No tag for version ${source_tag}"
         exit 1
@@ -28,7 +31,10 @@ gitstream_hotfix_start() {
         exit 1
     fi
 
-    gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
+    gitstream_make_branch "${source_tag}" "${branch}"
+
+    gitstream_run_hook post hotfix start "${hotfix}" "${branch}" "${WORKING_BRANCH}" "${source_tag}"
+
 
     echo
     echo "Your are now on ${branch}. When you are done with the hotfix, run git stream hotfix finish ${version} ${hotfix}"

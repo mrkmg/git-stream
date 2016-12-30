@@ -22,6 +22,8 @@ gitstream_release_finish() {
         exit 1
     fi
 
+    gitstream_run_hook_die pre release finish "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
+
     gitstream_checkout_branch "${WORKING_BRANCH}"
 
     if ! do_git tag ${prefixed_version}; then
@@ -55,5 +57,7 @@ gitstream_release_finish() {
     fi
 
     gitstream_checkout_branch "${WORKING_BRANCH}"
+
+    gitstream_run_hook post release finish "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
 
 }

@@ -20,6 +20,8 @@ gitstream_hotfix_finish() {
 
     branch="${HOTFIX_PREFIX}${hotfix}"
 
+    gitstream_run_hook_die pre hotfix finish "${hotfix}" "${branch}" "${WORKING_BRANCH}"
+
     if git_rev_exists ${new_prefixed_version}; then
         print_error "The tag ${new_prefixed_version} already exists."
         exit 1
@@ -37,8 +39,9 @@ gitstream_hotfix_finish() {
 
     gitstream_checkout_branch ${WORKING_BRANCH}
 
-    if [ ${GITSTREAM_HOTFIX_MERGE} -eq 1 ]; then
 
+
+    if [ ${GITSTREAM_HOTFIX_NOMERGE} -eq 0 ]; then
         if [ ${GITSTREAM_HOTFIX_NOFF} -eq 1 ] || [ ${#GITSTREAM_HOTFIX_MESSAGE} -gt 0 ]; then
             merge_args="${merge_args} --no-ff"
         fi
@@ -52,10 +55,16 @@ gitstream_hotfix_finish() {
         echo "${hotfix} has been applied to master."
     fi
 
-    if ! do_git branch -D ${branch}; then
-        print_error "Failed to remove ${branch}"
-        bug_error_message
-        exit 1
+    if [ ${GITSTREAM_HOTFIX_LEAVE} -eq 0 ]; then
+        if ! do_git branch -D ${branch}; then
+            print_error "Failed to remove ${branch}"
+            bug_error_message
+            exit 1
+        fi
+
+        echo "${branch} has been deleted.";
     fi
+
+    gitstream_run_hook post hotfix finish "${hotfix}" "${branch}" "${WORKING_BRANCH}"
 
 }

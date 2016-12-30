@@ -7,6 +7,8 @@ gitstream_feature_finish() {
     feature="$1"
     branch="${FEATURE_PREFIX}${feature}"
 
+    gitstream_run_hook_die pre feature finish "${feature}" "${branch}" "${WORKING_BRANCH}"
+
     if [ ${GITSTREAM_FEATURE_NOFF} -eq 1 ] || [ ${#GITSTREAM_FEATURE_MESSAGE} -gt 0 ]; then
         merge_args="${merge_args} --no-ff"
     fi
@@ -19,10 +21,14 @@ gitstream_feature_finish() {
 
     gitstream_merge "${branch}" "${WORKING_BRANCH}" ${merge_args}
 
-    if ! do_git branch -d ${branch}; then
-        print_error "Failed to remove ${branch}"
-        exit 1
+    if [ ${GITSTREAM_FEATURE_LEAVE} -eq 0 ]; then
+        if ! do_git branch -d ${branch}; then
+            print_error "Failed to remove ${branch}"
+            exit 1
+        fi
     fi
+
+    gitstream_run_hook post feature finish "${feature}" "${branch}" "${WORKING_BRANCH}"
 
     echo
     echo "Feature ${feature} has been merged into ${WORKING_BRANCH}"

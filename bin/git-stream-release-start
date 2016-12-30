@@ -17,6 +17,8 @@ gitstream_release_start() {
 
     branch="${RELEASE_PREFIX}${prefixed_version}"
 
+    gitstream_run_hook_die pre release start "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
+
     if git_rev_exists "${prefixed_version}"; then
         print_error "Tag ${prefixed_version} already exists"
         exit 1
@@ -28,6 +30,8 @@ gitstream_release_start() {
     fi
 
     gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
+
+    gitstream_run_hook post release start "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
 
     echo
     echo "Your are now on ${branch}. When you are done with the release, run git stream release finish ${version}"

@@ -4,6 +4,7 @@ load ../helpers/make-test-repo
 load ../helpers/git-current-branch
 load ../helpers/populate-example-branches
 load ../helpers/make-change
+load ../helpers/create-hooks
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -28,6 +29,38 @@ teardown() {
     git rev-parse "release/v1.0.0" >/dev/null 2>&1
 }
 
+@test "RELEASE: start with successful pre hook" {
+    create_hook_success pre release start
+
+    OUTPUT=$(git stream release start 1.0.0)
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    git rev-parse "release/v1.0.0"
+}
+
+@test "RELEASE: start with failure pre hook" {
+    create_hook_failure pre release start
+
+    ! OUTPUT=$(git stream release start 1.0.0)
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    ! git rev-parse "release/v1.0.0"
+}
+
+@test "RELEASE: start with successful post hook" {
+    create_hook_success post release start
+
+    OUTPUT=$(git stream release start 1.0.0)
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    git rev-parse "release/v1.0.0"
+}
+
+@test "RELEASE: start with failure post hook" {
+    create_hook_failure post release start
+
+    OUTPUT=$(git stream release start 1.0.0)
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    git rev-parse "release/v1.0.0"
+}
+
 @test "RELEASE: finish" {
     run git stream --debug release start 1.0.0
     make_change Release >/dev/null 2>&1
@@ -39,7 +72,7 @@ teardown() {
     [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged release changes
 }
 
-@test "RELEASE: finish message" {
+@test "RELEASE: finish with message" {
     git stream --debug release start 1.0.0
     make_change Release
     git stream --debug release finish -m "Merge Message" 1.0.0
@@ -47,7 +80,7 @@ teardown() {
     [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
 }
 
-@test "RELEASE: finish no merge" {
+@test "RELEASE: finish and skip merge" {
     run git stream --debug release start 1.0.0
     make_change Release > /dev/null 2>&1
     run git stream --debug release finish -d 1.0.0
@@ -58,7 +91,7 @@ teardown() {
     [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merge release
 }
 
-@test "RELEASE: finish leave" {
+@test "RELEASE: finish and leave" {
     run git stream --debug release start 1.0.0
     make_change Release > /dev/null 2>&1
     run git stream --debug release finish -l 1.0.0
@@ -67,6 +100,54 @@ teardown() {
     git rev-parse "release/v1.0.0"              #Kept hotfix branch
     [ "$(git_current_branch)" == "master" ]     #Changed to master
     [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged release changes
+}
+
+@test "RELEASE: finish with successful pre hook" {
+    create_hook_success pre release finish
+
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    OUTPUT=$(git stream --debug release finish 1.0.0)
+
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    ! git rev-parse "release/v1.0.0"
+
+}
+
+@test "RELEASE: finish with failure pre hook" {
+    create_hook_failure pre release finish
+
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    ! OUTPUT=$(git stream --debug release finish 1.0.0)
+
+    [[ "$OUTPUT" == *"Bad"* ]]       # Hook did run
+    git rev-parse "release/v1.0.0" # Canceled merge
+}
+
+
+@test "RELEASE: finish with successful post hook" {
+    create_hook_success post release finish
+
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    OUTPUT=$(git stream --debug release finish 1.0.0)
+
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    ! git rev-parse "release/v1.0.0"
+}
+
+
+@test "RELEASE: finish with failure post hook" {
+    create_hook_failure post release finish
+
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    OUTPUT=$(git stream --debug release finish 1.0.0)
+    echo "$OUTPUT"
+
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    ! git rev-parse "release/v1.0.0"
 }
 
 @test "RELEASE: list" {

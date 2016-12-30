@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Run after a release is started
+#
+# Arguments:
+# $1 release-name
+# $2 release-branch
+# $3 working-branch
+
+NAME=$1
+BRANCH=$2
+WORKING=$3
+
+# Implement Script Here
+
+exit 0

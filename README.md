@@ -9,11 +9,6 @@ decided I would build my own "git-flow".
 
 The name "Git Stream" was chosen as this plugin should streamline some of the repetitious actions in git.
 
-**Warning**
-
-Git Stream is still very new, with minimal testing by a single person so far. While I am open to suggestions, bug
-reports, etc, know that this project is a long way away from being ready for real use. As the project matures, this
-warning will be updated.
 
 [TOC levels=2-4]: # "#### Table of Contents"
 #### Table of Contents
@@ -24,6 +19,7 @@ warning will be updated.
         - [hotfix](#hotfix)
         - [feature](#feature)
         - [release](#release)
+    - [Hooks](#hooks)
 - [Example](#example)
 - [Recommendations](#recommendations)
 - [Other Notes](#other-notes)
@@ -51,7 +47,7 @@ Example Installation on Linux
     make test
     sudo make install
 
-By default, git-stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can
+By default, Git Stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can
 change the prefix. for example:
 
     sudo make install PREFIX=/usr
@@ -81,12 +77,13 @@ Initialize Git Stream on the current project.
 Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
     start {version} {hotfix-name}
-    finish [-l | -m {message} | -n] {versioned-hotfix-name} {new-version}
+    finish [-l -m {message} -n] {versioned-hotfix-name} {new-version}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
-    -l, --leave               Do not merge the hotfix back into the working branch
+    -d, --no-merge            Do not merge the hotfix branch back into the working branch (Implies -l)
+    -l, --leave               Do not remove the hotfix branch
 
 `-l/--leave` is useful when hot-fixing an LTS version which is no longer relevant to the working branch
 
@@ -95,24 +92,38 @@ Work with hotfixes. Hotfixes are used to fix a bug in a release.
 Work with features. Features are used to implement new functionality.
 
     start {feature-name}
-    finish [-m {message} | -n] {feature-name}
+    finish [-m {message} -n] {feature-name}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
+    -l, --leave               Do not remove the feature branch
 
 #### release
 
 Work with releases. Releases are used to mark specific versions.
 
     start {version}
-    finish [-l | -m {message} | -n] {version}
+    finish [-l -m {message} -n -d] {version}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
     -l, --leave               Do not remove the release branch
     -d, --no-merge            Do not merge the release branch back into the working branch
+
+### Hooks
+
+Git Stream will run hook in the .git/hooks directory. In order to see boilerplate scripts, look at the support/hooks
+directory.
+
+Any "pre" hook which returns a non-zero status will halt the operation. "post" hooks exit codes are not examined and
+will not affect the action from running.
+
+The available hooks are: `post-stream-feature-finish`, `post-stream-feature-start`, `post-stream-hotfix-finish`,
+`post-stream-hotfix-start`, `post-stream-release-finish`, `post-stream-release-start`, `pre-stream-feature-finish`,
+`pre-stream-feature-start`, `pre-stream-hotfix-finish`, `pre-stream-hotfix-start`, `pre-stream-release-finish`, and
+`pre-stream-release-start`
 
 ## Example
 
@@ -146,8 +157,8 @@ After you finish writing the new feature, go ahead and finish up the feature.
     git stream feature finish new-feature
 
 If you run into the message `Failed to merge feature/new-feature into master.`, that means you can not simply merge the
-feature into master as master has been changed. This can often happen if multiple features are being finished. The fix
-is very easy. Rebase master into your new feature branch.
+feature into master. This can often happen if multiple features are being finished. The fix is very easy. Rebase master
+into your new feature branch.
 
 While on the feature/new-feature branch, run the following commands:
 
@@ -175,7 +186,7 @@ This should not have any conflicts, but if it does you can rebase like you did w
 release back into master and create a tag for the version. At this point you probably would want to publish the version,
 so you can do that as simply as:
 
-    git push origin --tags
+    git push origin && git push origin --tags
 
 The last feature is the hotfix. Lets say some time goes by, you have committed to master a few times, started a couple
 new features, but then a bug is reported that needs an immediate fix. This is where Hot Fixes come into play. If back in
@@ -212,7 +223,7 @@ Make the proper corrections, stage them, then make a commit.
 
 ## Other Notes
 
-For an automated deployment, you may want to checkout the latest release. _If you only use tags for release, you can 
+For an automated deployment, you may want to checkout the latest release. _If you only use tags for release, you can
 easily accomplish this with:_
 
     git checkout $(git describe --abbrev=0 --tags)

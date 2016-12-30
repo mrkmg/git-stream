@@ -4,6 +4,7 @@ load ../helpers/make-test-repo
 load ../helpers/git-current-branch
 load ../helpers/populate-example-branches
 load ../helpers/make-change
+load ../helpers/create-hooks
 
 TESTING_PATH="/dev/null"
 STARTING_PATH="$(pwd)"
@@ -28,22 +29,109 @@ teardown() {
     git rev-parse "feature/feature1"
 }
 
+@test "FEATURE: start with successful pre hook" {
+    create_hook_success pre feature start
+
+    OUTPUT=$(git stream feature start feature1)
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    git rev-parse "feature/feature1"
+}
+
+@test "FEATURE: start with failure pre hook" {
+    create_hook_failure pre feature start
+
+    ! OUTPUT=$(git stream feature start feature1)
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    ! git rev-parse "feature/feature1"
+}
+
+@test "FEATURE: start with successful post hook" {
+    create_hook_success post feature start
+
+    OUTPUT=$(git stream feature start feature1)
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    git rev-parse "feature/feature1"
+}
+
+@test "FEATURE: start with failure post hook" {
+    create_hook_failure post feature start
+
+    OUTPUT=$(git stream feature start feature1)
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    git rev-parse "feature/feature1"
+}
+
 @test "FEATURE: finish" {
     git stream --debug feature start feature1
     make_change feature1
     git stream --debug feature finish feature1
 
-    ! git rev-parse "feature/feature1"      #Removed Branch
-    [ "$(git_current_branch)" == "master" ]                 #Put back on master
-    [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged change
+    ! git rev-parse "feature/feature1"        #Removed Branch
+    [ "$(git_current_branch)" == "master" ]   #Put back on master
+    [ "$(cat file1 | tail -n 1)" == "New" ]   #Merged change
 }
 
-@test "FEATURE: finish message" {
+@test "FEATURE: finish with message" {
     git stream --debug feature start feature1
     make_change feature1
     git stream --debug feature finish -m "Merge Message" feature1
 
     [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "Merge Message" ]
+}
+
+@test "FEATURE: finish and leave" {
+    git stream --debug feature start feature1
+    make_change feature1
+    git stream --debug feature finish -l feature1
+
+    git rev-parse "feature/feature1"        #Kept Branch
+}
+
+@test "FEATURE: finish with successful pre hook" {
+    create_hook_success pre feature finish
+
+    git stream --debug feature start feature1
+    make_change feature1
+    OUTPUT=$(git stream --debug feature finish feature1)
+
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    ! git rev-parse "feature/feature1"
+
+}
+
+@test "FEATURE: finish with failure pre hook" {
+    create_hook_failure pre feature finish
+
+    git stream --debug feature start feature1
+    make_change feature1
+    ! OUTPUT=$(git stream --debug feature finish feature1)
+
+    [[ "$OUTPUT" == *"Bad"* ]]       # Hook did run
+    git rev-parse "feature/feature1" # Canceled merge
+}
+
+
+@test "FEATURE: finish with successful post hook" {
+    create_hook_success post feature finish
+
+    git stream --debug feature start feature1
+    make_change feature1
+    OUTPUT=$(git stream --debug feature finish feature1)
+
+    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    ! git rev-parse "feature/feature1"
+}
+
+
+@test "FEATURE: finish with failure post hook" {
+    create_hook_failure post feature finish
+
+    git stream --debug feature start feature1
+    make_change feature1
+    OUTPUT=$(git stream --debug feature finish feature1)
+
+    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    ! git rev-parse "feature/feature1"
 }
 
 @test "FEATURE: list" {

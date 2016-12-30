@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Run after a hotfix is finished
+#
+# Arguments:
+# $1 hotfix-name
+# $2 hotfix-branch
+# $3 hotfix-source-branch
+
+NAME=$1
+BRANCH=$2
+SOURCE=$3
+
+# Implement Script Here
+
+exit 0

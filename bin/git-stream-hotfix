@@ -11,7 +11,8 @@ usage() {
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
     echo "-n, --no-ff               Force a non fast-forward merge"
-    echo "-l, --leave               Do not merge the hotfix back into the working branch"
+    echo "-d, --no-merge            Do not merge the hotfix branch back into the working branch"
+    echo "-l, --leave               Do not delete the hotfix branch"
 }
 
 gitstream_hotfix() {
@@ -33,7 +34,8 @@ gitstream_hotfix() {
 
     GITSTREAM_HOTFIX_MESSAGE=""
     GITSTREAM_HOTFIX_NOFF=0
-    GITSTREAM_HOTFIX_MERGE=1
+    GITSTREAM_HOTFIX_NOMERGE=0
+    GITSTREAM_HOTFIX_LEAVE=0
 
     while arg=$1 && [ "${arg:0:1}" == "-" ]; do
         case ${arg} in
@@ -43,11 +45,15 @@ gitstream_hotfix() {
                 ;;
             "-n"|"--no-ff")
                 shift
-                GITSTREAM_HOTFIX_NOFF=1;
+                GITSTREAM_HOTFIX_NOFF=1
                 ;;
             "-l"|"--leave")
                 shift
-                GITSTREAM_HOTFIX_MERGE=0;
+                GITSTREAM_HOTFIX_LEAVE=1
+                ;;
+            "-d"|"--no-merge")
+                shift
+                GITSTREAM_HOTFIX_NOMERGE=1
                 ;;
             *)
                 usage; exit 1

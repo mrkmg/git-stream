@@ -6,12 +6,16 @@ gitstream_feature_start() {
     feature="$1"
     branch="${FEATURE_PREFIX}${feature}"
 
+    gitstream_run_hook_die pre feature start "${feature}" "${branch}" "${WORKING_BRANCH}"
+
     if git_rev_exists ${branch}; then
         print_error "Branch ${branch} already exists"
         exit 1
     fi
 
     gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
+
+    gitstream_run_hook post feature start "${feature}" "${branch}" "${WORKING_BRANCH}"
 
     echo
     echo "Your are now on ${branch}. When you are done with the feature, run git stream feature finish ${feature}"

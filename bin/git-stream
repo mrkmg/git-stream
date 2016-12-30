@@ -177,6 +177,51 @@ gitstream_merge() {
     fi
 }
 
+gitstream_run_hook() {
+    local hook_dir script stage type action
+
+    stage="$1"; shift
+    type="$1"; shift
+    action="$1"; shift
+
+    hook_dir="$(git rev-parse --git-dir)/hooks"
+    script="${hook_dir}/${stage}-stream-${type}-${action}"
+
+    if [ -x "$script" ]; then
+        if [ ${GITSTREAM_DEBUG} -eq 1 ]; then
+            echo "Running ${script} $@" >&2
+        fi
+
+        "$script" "$@"
+
+        return 0
+    fi
+}
+
+gitstream_run_hook_die() {
+    local hook_dir script stage type action
+
+    stage="$1"; shift
+    type="$1"; shift
+    action="$1"; shift
+
+    hook_dir="$(git rev-parse --git-dir)/hooks"
+    script="${hook_dir}/${stage}-stream-${type}-${action}"
+
+    if [ -x "$script" ]; then
+        if [ ${GITSTREAM_DEBUG} -eq 1 ]; then
+            echo "Running ${script} $@" >&2
+        fi
+
+        "$script" "$@"
+
+        if [ "$?" -gt 0 ]; then
+            print_error "The hook ${script} exited with $?"
+            exit 1
+        fi
+    fi
+}
+
 gitstream_source() {
     local command command_type file func
 

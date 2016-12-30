@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#
+# Run after a feature is finished
+#
+# Arguments:
+# $1 feature-name
+# $2 feature-branch
+# $3 working-branch
+
+NAME=$1
+BRANCH=$2
+WORKING=$3
+
+# Implement Script Here
+
+exit 0
