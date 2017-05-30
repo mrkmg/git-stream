@@ -43,7 +43,7 @@ Example Installation on Linux
     git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
     cd /tmp/git-stream
     git submodule update --init --recursive
-    git checkout v0.5.0
+    git checkout v0.6.0
     make test
     sudo make install
 
@@ -251,7 +251,7 @@ Please see the ROADMAP file.
 
 ## License
 
-The MIT License (MIT) Copyright (c) 2016 Kevin Gravier <kevin@mrkmg.com>
+The MIT License (MIT) Copyright (c) 2017 Kevin Gravier <kevin@mrkmg.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
