@@ -6,19 +6,21 @@ FEATURE_PREFIX=""
 HOTFIX_PREFIX=""
 RELEASE_PREFIX=""
 WORKING_PREFIX=""
+DEFAULT_PUSH_REMOTE=""
 
 usage() {
     echo "Usage: git stream init <options>"
     echo
     echo "Available options are:"
     echo
-    echo "-d, --defaults             Initialize with all default options"
-    echo "-f, --force                Force Initialization"
-    echo "--version-prefix {prefix}  Version Prefix []"
-    echo "--feature-prefix {prefix}  Feature Branch Prefix [feature/]"
-    echo "--hotfix-prefix {prefix}   Hotfix Branch Prefix [hotfix/]"
-    echo "--release-prefix {prefix}  Release Branch Prefix [release/]"
-    echo "--working-branch {branch}  Working Branch [master]"
+    echo "-d, --defaults                  Initialize with all default options"
+    echo "-f, --force                     Force Initialization"
+    echo "--version-prefix {prefix}       Version Prefix []"
+    echo "--feature-prefix {prefix}       Feature Branch Prefix [feature/]"
+    echo "--hotfix-prefix {prefix}        Hotfix Branch Prefix [hotfix/]"
+    echo "--release-prefix {prefix}       Release Branch Prefix [release/]"
+    echo "--working-branch {branch}       Working Branch [master]"
+    echo "--default-push-remote {remote}  Remote branch to push to. If empty, no automated pushes will occur [origin]"
 }
 
 unknownOptionMessage() {
@@ -54,28 +56,36 @@ setDefaults() {
         WORKING_BRANCH="master"
     fi
 
+    if [[ -z ${DEFAULT_PUSH_REMOTE} ]]; then
+        DEFAULT_PUSH_REMOTE="origin"
+    fi
+
 }
 
 promptForNeededConfiguration() {
     if [[ -z ${VERSION_PREFIX} ]]; then
         read -p "Version Prefix []: " VERSION_PREFIX
-    fi;
+    fi
 
     if [[ -z ${FEATURE_PREFIX} ]]; then
         read -p "Feature Branch Prefix [feature/]: " FEATURE_PREFIX
-    fi;
+    fi
 
     if [[ -z ${HOTFIX_PREFIX} ]]; then
         read -p "Hotfix Branch Prefix [hotfix/]: " HOTFIX_PREFIX
-    fi;
+    fi
 
     if [[ -z ${RELEASE_PREFIX} ]]; then
         read -p "Release Branch Prefix [release/]: " RELEASE_PREFIX
-    fi;
+    fi
 
     if [[ -z ${WORKING_BRANCH} ]]; then
         read -p "Working Branch [master]: " WORKING_BRANCH
-    fi;
+    fi
+
+    if [[ -z ${DEFAULT_PUSH_REMOTE} ]]; then
+        read -p "Default Push Remote [origin]: " DEFAULT_PUSH_REMOTE
+    fi
 }
 
 removeOldInitialization() {
@@ -88,6 +98,7 @@ writeConfig() {
     git config gitstream.prefix.feature ${FEATURE_PREFIX}
     git config gitstream.prefix.hotfix ${HOTFIX_PREFIX}
     git config gitstream.prefix.release ${RELEASE_PREFIX}
+    git config gitstream.defaultpushremote ${DEFAULT_PUSH_REMOTE}
 }
 
 moveToWorkingBranch() {
@@ -128,6 +139,9 @@ gitstream_init() {
             --working-branch)
                 WORKING_BRANCH=$1; shift
                 ;;
+            --default-push-remote)
+                DEFAULT_PUSH_REMOTE=$1; shift
+                ;;
             *)
                 unknownOptionMessage ${option}; usage; exit 1
                 ;;
@@ -138,16 +152,14 @@ gitstream_init() {
         alreadyInitializedMessage; exit 1;
     fi
 
-    if [ ${USE_DEFAULTS} -eq 1 ]; then
-        setDefaults
-    else
+    if [ ${USE_DEFAULTS} -eq 0 ]; then
         promptForNeededConfiguration
-        setDefaults
     fi
 
+    setDefaults
+
     if gitstream_is_initialized; then
-        git config --remove-section gitstream.branch
-        git config --remove-section gitstream.prefix
+        git config --remove-section gitstream
     fi
 
     writeConfig

@@ -7,13 +7,16 @@ load ../helpers/make-change
 load ../helpers/create-hooks
 
 TESTING_PATH="/dev/null"
+TESTING_REMOTE="/dev/null"
 STARTING_PATH="$(pwd)"
 PATH="$(pwd)/bin:$PATH"
 
 setup() {
     TESTING_PATH=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
+    TESTING_REMOTE=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
     rm -rf ${TESTING_PATH}
-    make_test_repo ${TESTING_PATH}
+    rm -rf ${TESTING_REMOTE}
+    make_test_repo ${TESTING_PATH} ${TESTING_REMOTE}
     cd ${TESTING_PATH}
     git stream --debug init -d --version-prefix 'v' >/dev/null
 }
@@ -69,6 +72,7 @@ teardown() {
     ! git rev-parse "feature/feature1"        #Removed Branch
     [ "$(git_current_branch)" == "master" ]   #Put back on master
     [ "$(cat file1 | tail -n 1)" == "New" ]   #Merged change
+    [ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]      #Pushed changes
 }
 
 @test "FEATURE: finish with message" {
@@ -85,6 +89,17 @@ teardown() {
     git stream --debug feature finish -l feature1
 
     git rev-parse "feature/feature1"        #Kept Branch
+}
+
+@test "FEATURE: finish and no push" {
+    git stream --debug feature start feature1
+    make_change feature1
+    git stream --debug feature finish -p feature1
+
+    ! git rev-parse "feature/feature1"        #Removed Branch
+    [ "$(git_current_branch)" == "master" ]   #Put back on master
+    [ "$(cat file1 | tail -n 1)" == "New" ]   #Merged change
+    [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]      #Didn't push changes
 }
 
 @test "FEATURE: finish with successful pre hook" {

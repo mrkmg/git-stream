@@ -52,6 +52,18 @@ git_list_branches() {
     git for-each-ref --format='%(refname:short)' refs/heads/
 }
 
+git_push() {
+    if [[ -n ${DEFAULT_PUSH_REMOTE} ]]; then
+        do_git push ${DEFAULT_PUSH_REMOTE} ${WORKING_BRANCH}
+    fi
+}
+
+git_push_tags() {
+    if [[ -n ${DEFAULT_PUSH_REMOTE} ]]; then
+        do_git push ${DEFAULT_PUSH_REMOTE} --tags
+    fi
+}
+
 do_git() {
     if [ ${GITSTREAM_DEBUG} -eq 1 ]; then
         echo git "$@" >&2
@@ -80,6 +92,7 @@ gitstream_environment() {
     HOTFIX_PREFIX=$(git config gitstream.prefix.hotfix)
     RELEASE_PREFIX=$(git config gitstream.prefix.release)
     WORKING_BRANCH=$(git config gitstream.branch.working)
+    DEFAULT_PUSH_REMOTE=$(git config gitstream.defaultpushremote)
 }
 
 gitstream_make_branch() {

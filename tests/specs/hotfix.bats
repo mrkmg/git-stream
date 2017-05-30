@@ -7,13 +7,16 @@ load ../helpers/make-change
 load ../helpers/create-hooks
 
 TESTING_PATH="/dev/null"
+TESTING_REMOTE="/dev/null"
 STARTING_PATH="$(pwd)"
 PATH="$(pwd)/bin:$PATH"
 
 setup() {
     TESTING_PATH=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
+    TESTING_REMOTE=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
     rm -rf ${TESTING_PATH}
-    make_test_repo ${TESTING_PATH}
+    rm -rf ${TESTING_REMOTE}
+    make_test_repo ${TESTING_PATH} ${TESTING_REMOTE}
     cd ${TESTING_PATH}
     git stream --debug init -d --version-prefix 'v' >/dev/null
     git stream --debug release start 1.0.0
@@ -68,10 +71,11 @@ teardown() {
     make_change Hotfix
     git stream --debug hotfix finish 1.0.0-hotfix1 1.0.1
 
-    git rev-parse "v1.0.1"                      #Added Tag
-    ! git rev-parse "hotfix/1.0.0-hotfix1"      #Removed hotfix branch
-    [ "$(git_current_branch)" == "master" ]     #Changed to master
-    [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged hotfixed changes
+    git rev-parse "v1.0.1"                              #Added Tag
+    ! git rev-parse "hotfix/1.0.0-hotfix1"              #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]             #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]             #Merged hotfixed changes
+    [ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]  #Pushed changes
 }
 
 @test "HOTFIX: finish and merge message" {
@@ -96,6 +100,18 @@ teardown() {
     git stream --debug hotfix finish -d 1.0.0-hotfix1 1.0.1
 
     [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merge hotfixed changes
+}
+
+@test "HOTFIX: finish and no push" {
+    git stream --debug hotfix start 1.0.0 hotfix1
+    make_change Hotfix
+    git stream --debug hotfix finish -p 1.0.0-hotfix1 1.0.1
+
+    git rev-parse "v1.0.1"                              #Added Tag
+    ! git rev-parse "hotfix/1.0.0-hotfix1"              #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]             #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]             #Merged hotfixed changes
+    [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]  #Didn't push changes
 }
 
 @test "HOTFIX: finish with successful pre hook" {

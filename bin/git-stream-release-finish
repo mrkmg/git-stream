@@ -58,6 +58,10 @@ gitstream_release_finish() {
 
     gitstream_checkout_branch "${WORKING_BRANCH}"
 
-    gitstream_run_hook post release finish "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
+    if [ ${GITSTREAM_RELEASE_NO_PUSH} -eq 0 ]; then
+        git_push
+        git_push_tags
+    fi
 
+    gitstream_run_hook post release finish "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
 }

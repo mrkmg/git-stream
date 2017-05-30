@@ -65,6 +65,10 @@ gitstream_hotfix_finish() {
         echo "${branch} has been deleted.";
     fi
 
+    if [ ${GITSTREAM_HOTFIX_NO_PUSH} -eq 0 ]; then
+        git_push
+    fi
+
     gitstream_run_hook post hotfix finish "${hotfix}" "${branch}" "${WORKING_BRANCH}"
 
 }

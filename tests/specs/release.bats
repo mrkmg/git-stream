@@ -7,13 +7,17 @@ load ../helpers/make-change
 load ../helpers/create-hooks
 
 TESTING_PATH="/dev/null"
+TESTING_REMOTE="/dev/null"
 STARTING_PATH="$(pwd)"
 PATH="$(pwd)/bin:$PATH"
 
 setup() {
+    cd ${STARTING_PATH}
     TESTING_PATH=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
+    TESTING_REMOTE=`mktemp -d 2>/dev/null || mktemp -d -t 'git-stream-test'`
     rm -rf ${TESTING_PATH}
-    make_test_repo ${TESTING_PATH}
+    rm -rf ${TESTING_REMOTE}
+    make_test_repo ${TESTING_PATH} ${TESTING_REMOTE}
     cd ${TESTING_PATH}
     git stream init -d --version-prefix 'v' >/dev/null
 }
@@ -21,6 +25,7 @@ setup() {
 teardown() {
     cd ${STARTING_PATH}
     rm -rf ${TESTING_PATH}
+    rm -rf ${TESTING_REMOTE}
 }
 
 @test "RELEASE: start" {
@@ -66,10 +71,13 @@ teardown() {
     make_change Release >/dev/null 2>&1
     run git stream --debug release finish 1.0.0
 
+    run git fetch
+
     git rev-parse "v1.0.0" >/dev/null 2>&1                  #Added Tag
     ! git rev-parse "release/v1.0.0" >/dev/null 2>&1        #Removed release branch
     [ "$(git_current_branch)" == "master" ]                 #Changed to master
     [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged release changes
+    [ $(git rev-parse HEAD) == $(git rev-parse @{u}) ]      #Pushed changes
 }
 
 @test "RELEASE: finish with message" {
@@ -85,10 +93,10 @@ teardown() {
     make_change Release > /dev/null 2>&1
     run git stream --debug release finish -d 1.0.0
 
-    git rev-parse "v1.0.0" >/dev/null 2>&1      #Added Tag
-    ! git rev-parse "release/v1.0.0"            #Removed hotfix branch
-    [ "$(git_current_branch)" == "master" ]     #Changed to master
-    [ "$(cat file1 | tail -n 1)" != "New" ]     #Didn't merge release
+    git rev-parse "v1.0.0" >/dev/null 2>&1                  #Added Tag
+    ! git rev-parse "release/v1.0.0"                        #Removed hotfix branch
+    [ "$(git_current_branch)" == "master" ]                 #Changed to master
+    [ "$(cat file1 | tail -n 1)" != "New" ]                 #Didn't merge release
 }
 
 @test "RELEASE: finish and leave" {
@@ -96,10 +104,23 @@ teardown() {
     make_change Release > /dev/null 2>&1
     run git stream --debug release finish -l 1.0.0
 
-    git rev-parse "v1.0.0" >/dev/null 2>&1      #Added Tag
-    git rev-parse "release/v1.0.0"              #Kept hotfix branch
-    [ "$(git_current_branch)" == "master" ]     #Changed to master
-    [ "$(cat file1 | tail -n 1)" == "New" ]     #Merged release changes
+    git rev-parse "v1.0.0" >/dev/null 2>&1                  #Added Tag
+    git rev-parse "release/v1.0.0"                          #Kept hotfix branch
+    [ "$(git_current_branch)" == "master" ]                 #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged release changes
+
+}
+
+@test "RELEASE: finish and no push" {
+    run git stream --debug release start 1.0.0
+    make_change Release > /dev/null 2>&1
+    run git stream --debug release finish -p 1.0.0
+
+    git rev-parse "v1.0.0" >/dev/null 2>&1                  #Added Tag
+    ! git rev-parse "release/v1.0.0" >/dev/null 2>&1        #Removed release branch
+    [ "$(git_current_branch)" == "master" ]                 #Changed to master
+    [ "$(cat file1 | tail -n 1)" == "New" ]                 #Merged release changes
+    [ $(git rev-parse HEAD) != $(git rev-parse \@{u}) ]     #Didn't push changes
 }
 
 @test "RELEASE: finish with successful pre hook" {
@@ -109,7 +130,7 @@ teardown() {
     make_change Release > /dev/null 2>&1
     OUTPUT=$(git stream --debug release finish 1.0.0)
 
-    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    [[ "$OUTPUT" == *"Good"* ]]                             #Hook did run
     ! git rev-parse "release/v1.0.0"
 
 }
@@ -121,8 +142,8 @@ teardown() {
     make_change Release > /dev/null 2>&1
     ! OUTPUT=$(git stream --debug release finish 1.0.0)
 
-    [[ "$OUTPUT" == *"Bad"* ]]       # Hook did run
-    git rev-parse "release/v1.0.0" # Canceled merge
+    [[ "$OUTPUT" == *"Bad"* ]]                              #Hook did run
+    git rev-parse "release/v1.0.0"                          #Canceled merge
 }
 
 
@@ -133,7 +154,7 @@ teardown() {
     make_change Release > /dev/null 2>&1
     OUTPUT=$(git stream --debug release finish 1.0.0)
 
-    [[ "$OUTPUT" == *"Good"* ]]  # Hook did run
+    [[ "$OUTPUT" == *"Good"* ]]                             # Hook did run
     ! git rev-parse "release/v1.0.0"
 }
 
@@ -146,7 +167,7 @@ teardown() {
     OUTPUT=$(git stream --debug release finish 1.0.0)
     echo "$OUTPUT"
 
-    [[ "$OUTPUT" == *"Bad"* ]]  # Hook did run
+    [[ "$OUTPUT" == *"Bad"* ]]                              # Hook did run
     ! git rev-parse "release/v1.0.0"
 }
 

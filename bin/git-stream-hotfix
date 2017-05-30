@@ -6,13 +6,14 @@ usage() {
     echo "Available subcommands are:"
     echo
     echo "start {version} {hotfix-name}"
-    echo "finish [-l | -m {message} | -n] {versioned-hotfix-name} {new-version}"
+    echo "finish [-l | -m {message} | -n | -p] {versioned-hotfix-name} {new-version}"
     echo "list"
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
     echo "-n, --no-ff               Force a non fast-forward merge"
     echo "-d, --no-merge            Do not merge the hotfix branch back into the working branch"
     echo "-l, --leave               Do not delete the hotfix branch"
+    echo "-p, --no-push             Do not push changes to the remote"
 }
 
 gitstream_hotfix() {
@@ -36,6 +37,7 @@ gitstream_hotfix() {
     GITSTREAM_HOTFIX_NOFF=0
     GITSTREAM_HOTFIX_NOMERGE=0
     GITSTREAM_HOTFIX_LEAVE=0
+    GITSTREAM_HOTFIX_NO_PUSH=0
 
     while arg=$1 && [ "${arg:0:1}" == "-" ]; do
         case ${arg} in
@@ -54,6 +56,10 @@ gitstream_hotfix() {
             "-d"|"--no-merge")
                 shift
                 GITSTREAM_HOTFIX_NOMERGE=1
+                ;;
+            "-p"|"--no-push")
+                shift
+                GITSTREAM_HOTFIX_NO_PUSH=1
                 ;;
             *)
                 usage; exit 1

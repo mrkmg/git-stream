@@ -64,26 +64,28 @@ All Git Stream commands are issued as follows:
 
 Initialize Git Stream on the current project.
 
-    -d, --defaults             Initialize with all default options
-    -f, --force                Force Initialization
-    --version-prefix {prefix}  Version Prefix []
-    --feature-prefix {prefix}  Feature Branch Prefix [feature/]
-    --hotfix-prefix {prefix}   Hotfix Branch Prefix [hotfix/]
-    --release-prefix {prefix}  Release Branch Prefix [release/]
-    --working-branch {branch}  Working Branch [master]
+    -d, --defaults                  Initialize with all default options
+    -f, --force                     Force Initialization
+    --version-prefix {prefix}       Version Prefix []
+    --feature-prefix {prefix}       Feature Branch Prefix [feature/]
+    --hotfix-prefix {prefix}        Hotfix Branch Prefix [hotfix/]
+    --release-prefix {prefix}       Release Branch Prefix [release/]
+    --working-branch {branch}       Working Branch [master]
+    --default-push-remote {remote}  Remote branch to push to. If empty, no automated pushes will occur [origin]
 
 #### hotfix
 
 Work with hotfixes. Hotfixes are used to fix a bug in a release.
 
     start {version} {hotfix-name}
-    finish [-l -m {message} -n] {versioned-hotfix-name} {new-version}
+    finish [-l -m {message} -n -p] {versioned-hotfix-name} {new-version}
     list
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
     -d, --no-merge            Do not merge the hotfix branch back into the working branch (Implies -l)
     -l, --leave               Do not remove the hotfix branch
+    -p, --no-push             Do not push the changes to the remote
 
 `-l/--leave` is useful when hot-fixing an LTS version which is no longer relevant to the working branch
 
@@ -98,6 +100,7 @@ Work with features. Features are used to implement new functionality.
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
     -l, --leave               Do not remove the feature branch
+    -p, --no-push             Do not push the changes to the remote
 
 #### release
 
@@ -111,6 +114,7 @@ Work with releases. Releases are used to mark specific versions.
     -n, --no-ff               Force a non fast-forward merge
     -l, --leave               Do not remove the release branch
     -d, --no-merge            Do not merge the release branch back into the working branch
+    -p, --no-push             Do not push the changes to the remote
 
 ### Hooks
 
@@ -156,6 +160,8 @@ After you finish writing the new feature, go ahead and finish up the feature.
 
     git stream feature finish new-feature
 
+If this runs correctly, git stream will merge that feature into your master branch and push it up to the origin.
+
 If you run into the message `Failed to merge feature/new-feature into master.`, that means you can not simply merge the
 feature into master. This can often happen if multiple features are being finished. The fix is very easy. Rebase master
 into your new feature branch.
@@ -183,10 +189,8 @@ making all the changes and committed them, finish the release.
     git stream release finish 1.1.0
 
 This should not have any conflicts, but if it does you can rebase like you did with features. This will merge the
-release back into master and create a tag for the version. At this point you probably would want to publish the version,
-so you can do that as simply as:
-
-    git push origin && git push origin --tags
+release back into master and create a tag for the version. It will also push both your master branch and the new tags
+up to origin.
 
 The last feature is the hotfix. Lets say some time goes by, you have committed to master a few times, started a couple
 new features, but then a bug is reported that needs an immediate fix. This is where Hot Fixes come into play. If back in

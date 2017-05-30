@@ -30,6 +30,10 @@ gitstream_feature_finish() {
 
     gitstream_run_hook post feature finish "${feature}" "${branch}" "${WORKING_BRANCH}"
 
+    if [ ${GITSTREAM_FEATURE_NO_PUSH} -eq 0 ]; then
+        git_push
+    fi
+
     echo
     echo "Feature ${feature} has been merged into ${WORKING_BRANCH}"
 }
