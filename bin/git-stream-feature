@@ -8,6 +8,7 @@ usage() {
     echo "start {feature-name}"
     echo "finish [-l | -m {message} | -n | -p] {feature-name}"
     echo "list"
+    echo "update {feature-name}"
     echo
     echo "-m, --message {message}   A message for the merge (Implies -n)"
     echo "-n, --no-ff               Force a non fast-forward merge"

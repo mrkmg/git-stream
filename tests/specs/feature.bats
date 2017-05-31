@@ -158,3 +158,13 @@ teardown() {
 
     [ "${feature_branches}" == "${expected_branches}" ]
 }
+
+@test "FEATURE: update" {
+    populate_example_branches
+    run git checkout master
+    make_change update1
+    run git stream feature update feature1
+
+    git rev-parse "feature/feature1"
+    [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "update1" ]
+}

@@ -96,6 +96,7 @@ Work with features. Features are used to implement new functionality.
     start {feature-name}
     finish [-m {message} -n] {feature-name}
     list
+    update {feature-name}
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
@@ -124,10 +125,10 @@ directory.
 Any "pre" hook which returns a non-zero status will halt the operation. "post" hooks exit codes are not examined and
 will not affect the action from running.
 
-The available hooks are: `post-stream-feature-finish`, `post-stream-feature-start`, `post-stream-hotfix-finish`,
-`post-stream-hotfix-start`, `post-stream-release-finish`, `post-stream-release-start`, `pre-stream-feature-finish`,
-`pre-stream-feature-start`, `pre-stream-hotfix-finish`, `pre-stream-hotfix-start`, `pre-stream-release-finish`, and
-`pre-stream-release-start`
+The available hooks are: `post-stream-feature-finish`, `post-stream-feature-start`, `post-stream-feature-update`
+`post-stream-hotfix-finish`, `post-stream-hotfix-start`, `post-stream-release-finish`, `post-stream-release-start`,
+`pre-stream-feature-finish`, `pre-stream-feature-start`, `pre-stream-feature-update`, `pre-stream-hotfix-finish`,
+`pre-stream-hotfix-start`, `pre-stream-release-finish`, and `pre-stream-release-start`
 
 ## Example
 

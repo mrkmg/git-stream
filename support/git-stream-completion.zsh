@@ -165,6 +165,7 @@ __git-stream-feature ()
                 'start:Start a new feature branch.'
                 'finish:Finish a feature branch.'
                 'list:List all your feature branches.'
+                'update:Rebase a feature branch to master.'
             )
             _describe -t commands 'git stream feature' subcommands
         ;;
@@ -181,6 +182,11 @@ __git-stream-feature ()
                     _arguments \
                         {-m,--message}'[Use the given tag message]:message'\
                         {-n,--no-ff}'[No Fast-Forward]'\
+                        ':feature:__git_stream_feature_list'
+                ;;
+
+                (finish)
+                    _arguments \
                         ':feature:__git_stream_feature_list'
                 ;;
 

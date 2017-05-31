@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#
+# Run before a feature branch is updated
+# If this scripts exits with a non-zero code, the operation is canceled
+#
+# Arguments:
+# $1 feature-name
+# $2 feature-branch
+# $3 working-branch
+
+NAME=$1
+BRANCH=$2
+WORKING=$3
+
+# Implement Script Here
+
+exit 0
