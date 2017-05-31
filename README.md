@@ -167,11 +167,16 @@ After you finish writing the new feature, go ahead and finish up the feature.
 If this runs correctly, git stream will merge that feature into your master branch and push it up to the origin.
 
 If you run into the message `Failed to merge feature/new-feature into master.`, that means you can not simply merge the
-feature into master. This can often happen if multiple features are being finished. The fix is very easy. Rebase master
-into your new feature branch.
+feature into master. This can often happen if multiple features are being finished. You can either use Git Stream to fix
+the issue or fix it manually.
 
-While on the feature/new-feature branch, run the following commands:
+To allow Git Stream to fix the issue, run the following:
 
+    git stream feature update new-feature
+
+or you can fix it manually with:
+
+    git checkout feature/new-feature
     git rebase master
 
 Fix all the conflicts, finish the rebase, and finish the feature.
