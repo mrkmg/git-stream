@@ -18,7 +18,7 @@ usage() {
 }
 
 version() {
-    echo "Git Stream v0.6.0"
+    echo "Git Stream v0.6.1"
 }
 
 git_current_branch () {
