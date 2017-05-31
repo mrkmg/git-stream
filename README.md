@@ -103,6 +103,9 @@ Work with features. Features are used to implement new functionality.
     -l, --leave               Do not remove the feature branch
     -p, --no-push             Do not push the changes to the remote
 
+`update` will bring the {feature-name} branch up to date with master. This is useful if master has changed since the
+feature branch was created.
+
 #### release
 
 Work with releases. Releases are used to mark specific versions.
@@ -242,9 +245,9 @@ Not all use cases are covered here, for example putting multiple hotfixes in one
 you can use it when you want. For small, single-developer projects, it may be fine to work on new features directly on
 the master branch.
 
-Much is left to the native git command, and Git Stream's goal is not to duplicate existing functionality of git, which
-is why merging, rebasing, pushing, pulling, etc are left up to git. Those commands already work perfectly and is not
-really needed to be duplicated in Git Stream.
+While some of the git functions such as merging, pulling, pushing, etc are handled by Git Stream, there are still many
+cases where you will still be using the native git commands. This is intentional. The goal of Git Stream is not to
+replace the usage of git, but to augment it with some simple helper scripts.
 
 ## Roadmap
 
