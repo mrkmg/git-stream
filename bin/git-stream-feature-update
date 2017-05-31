@@ -1,22 +1,27 @@
 #!/usr/bin/env bash
 
-gitstream_feature_start() {
+gitstream_feature_update() {
     local feature branch
 
     feature="$1"
     branch="${FEATURE_PREFIX}${feature}"
 
-    gitstream_run_hook_die pre feature start "${feature}" "${branch}" "${WORKING_BRANCH}"
+    gitstream_run_hook_die pre feature update "${feature}" "${branch}" "${WORKING_BRANCH}"
 
-    if git_rev_exists ${branch}; then
-        print_error "Branch ${branch} already exists"
-        exit 1
+    if ! git_working_dir_clean; then
+        print_error "Working directory is not clean. Please commit or stash your changes before proceeding"
     fi
 
-    gitstream_make_branch "${WORKING_BRANCH}" "${branch}"
+    gitstream_checkout_branch "${WORKING_BRANCH}"
 
-    gitstream_run_hook post feature start "${feature}" "${branch}" "${WORKING_BRANCH}"
+    git_pull
+
+    gitstream_checkout_branch "${branch}"
+
+    dogit rebase "${WORKING_BRANCH}"
+
+    gitstream_run_hook post feature update "${feature}" "${branch}" "${WORKING_BRANCH}"
 
     echo
-    echo "Your are now on ${branch}. When you are done with the feature, run git stream feature finish ${feature}"
+    echo "The ${branch} is now up to date with ${WORKING_BRANCH}."
 }

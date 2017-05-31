@@ -52,6 +52,12 @@ git_list_branches() {
     git for-each-ref --format='%(refname:short)' refs/heads/
 }
 
+git_pull() {
+    if [[ -n ${DEFAULT_PUSH_REMOTE} ]]; then
+        do_git pull ${DEFAULT_PUSH_REMOTE} ${WORKING_BRANCH}
+    fi
+}
+
 git_push() {
     if [[ -n ${DEFAULT_PUSH_REMOTE} ]]; then
         do_git push ${DEFAULT_PUSH_REMOTE} ${WORKING_BRANCH}
