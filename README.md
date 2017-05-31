@@ -122,8 +122,8 @@ Work with releases. Releases are used to mark specific versions.
 
 ### Hooks
 
-Git Stream will run hook in the .git/hooks directory. In order to see boilerplate scripts, look at the support/hooks
-directory.
+Git Stream will run any hooks in the .git/hooks directory. In order to see boilerplate scripts, look at the
+support/hooks directory.
 
 Any "pre" hook which returns a non-zero status will halt the operation. "post" hooks exit codes are not examined and
 will not affect the action from running.
