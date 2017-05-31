@@ -18,7 +18,7 @@ gitstream_feature_update() {
 
     gitstream_checkout_branch "${branch}"
 
-    dogit rebase "${WORKING_BRANCH}"
+    do_git rebase "${WORKING_BRANCH}"
 
     gitstream_run_hook post feature update "${feature}" "${branch}" "${WORKING_BRANCH}"
 
