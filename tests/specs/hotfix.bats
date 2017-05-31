@@ -26,6 +26,7 @@ setup() {
 teardown() {
     cd ${STARTING_PATH}
     rm -rf ${TESTING_PATH}
+    rm -rf ${TESTING_REMOTE}
 }
 
 @test "HOTFIX: start" {
