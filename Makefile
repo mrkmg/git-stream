@@ -9,6 +9,7 @@ COMMANDS			+=	git-stream-feature
 COMMANDS			+=	git-stream-feature-start
 COMMANDS			+=	git-stream-feature-finish
 COMMANDS			+=	git-stream-feature-list
+COMMANDS			+=	git-stream-feature-update
 COMMANDS			+=	git-stream-hotfix
 COMMANDS			+=	git-stream-hotfix-start
 COMMANDS			+=	git-stream-hotfix-finish
@@ -33,3 +34,4 @@ uninstall:
 	test -d $(DEST_BIN_DIR) && \
 	cd $(DEST_BIN_DIR) && \
 	rm -f $(LOADER) $(COMMANDS)
+
