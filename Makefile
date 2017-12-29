@@ -1,4 +1,4 @@
-VERSION		 				=	0.1.0
+VERSION		 				=	0.7.1
 
 PREFIX		  				?=	/usr/local
 DEST_BIN_DIR				=	$(PREFIX)/bin
