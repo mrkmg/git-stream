@@ -28,7 +28,7 @@ gitstream_release() {
     sub_command="$1"; shift
 
     case ${sub_command} in
-        "-h"|"--help")
+        "-h"|"--help"|"help")
             usage; exit 0
             ;;
     esac

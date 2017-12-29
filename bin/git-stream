@@ -14,7 +14,7 @@ usage() {
     echo "hotfix    Work with Hotfixes"
     echo "release   Work with Releases"
     echo "help      Show this help"
-    echo "version   Show the Version and exit"
+    echo "version   Show version"
 }
 
 version() {
@@ -283,7 +283,7 @@ main() {
     local sub_command="$1"; shift
 
     case ${sub_command} in
-        "-h"|"--help")
+        "-h"|"--help"|"help")
             usage; exit 0
             ;;
         "-v"|"--version"|"version")

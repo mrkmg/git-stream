@@ -115,7 +115,7 @@ gitstream_init() {
         option="$1"; shift
 
         case ${option} in
-            -h|--help)
+            -h|--help|help)
                 usage; exit 0
                 ;;
             -d|--defaults)
