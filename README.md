@@ -46,6 +46,8 @@ Example Installation on Linux
     git checkout v0.7.0
     make test
     sudo make install
+    # To install the bash completion
+    sudo make install_completion
 
 By default, Git Stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can
 change the prefix. for example:

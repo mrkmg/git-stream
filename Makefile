@@ -23,7 +23,7 @@ COMMANDS					+=	git-stream-release-finish
 COMMANDS					+=	git-stream-release-list
 
 all:
-	@echo "usage: make [test|install|uninstall]"
+	@echo "usage: make [test|install|uninstall|install_completion|uninstall_completion]"
 
 test:
 	./tests/bats/bin/bats ./tests/specs/*
