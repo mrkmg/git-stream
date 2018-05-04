@@ -17,6 +17,9 @@ gitstream_release_finish() {
 
     branch="${RELEASE_PREFIX}${prefixed_version}"
 
+
+    gitstream_checkout_branch "${branch}"
+
     if git_rev_exists ${prefixed_version}; then
         print_error "Tag ${prefixed_version} already exists"
         exit 1
@@ -24,12 +27,12 @@ gitstream_release_finish() {
 
     gitstream_run_hook_die pre release finish "${prefixed_version}" "${branch}" "${WORKING_BRANCH}"
 
-    gitstream_checkout_branch "${WORKING_BRANCH}"
-
     if ! do_git tag ${prefixed_version}; then
         print_error "Failed to create tag ${prefixed_version}"
         exit 1
     fi
+
+    gitstream_checkout_branch "${WORKING_BRANCH}"
 
     if [ ${GITSTREAM_RELEASE_NOMERGE} -eq 0 ]; then
         if [ ${GITSTREAM_RELEASE_NOFF} -eq 1 ] || [ ${#GITSTREAM_RELEASE_MESSAGE} -gt 0 ]; then
