@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+gitstream_release_update() {
+    local version prefixed_version branch merge_args
+
+    if [ $# -ne 1 ]; then
+        usage; exit 1;
+    fi
+
+    version="$1"
+
+    if [ ${version:0:${#VERSION_PREFIX}} = ${VERSION_PREFIX} ]; then
+        prefixed_version="${version}"
+    else
+        prefixed_version="${VERSION_PREFIX}${version}"
+    fi
+
+    branch="${RELEASE_PREFIX}${prefixed_version}"
+
+    gitstream_run_hook_die pre release update "${version}" "${branch}" "${WORKING_BRANCH}"
+
+    if ! git_working_dir_clean; then
+        print_error "Working directory is not clean. Please commit or stash your changes before proceeding"
+    fi
+
+    gitstream_checkout_branch "${WORKING_BRANCH}"
+
+    git_pull
+
+    gitstream_checkout_branch "${branch}"
+
+    do_git rebase "${WORKING_BRANCH}"
+
+    gitstream_run_hook post release update "${version}" "${branch}" "${WORKING_BRANCH}"
+
+    echo
+    echo "The ${branch} is now up to date with ${WORKING_BRANCH}."
+}

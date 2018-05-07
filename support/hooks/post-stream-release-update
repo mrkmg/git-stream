@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 #
-# Run before a release is finished
-# If this scripts exits with a non-zero code, the operation is canceled
+# Run after a release is updated
 #
 # Arguments:
 # $1 version
-# $2 release-branch
+# $2 feature-branch
 # $3 working-branch
 
 VERSION=$1

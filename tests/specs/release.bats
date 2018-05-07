@@ -179,3 +179,13 @@ teardown() {
 
     [ "${release_branches}" == "${expected_branches}" ]
 }
+
+@test "RELEASE: update" {
+    populate_example_branches
+    run git checkout master
+    make_change update1
+    run git stream release update 0.0.1
+
+    git rev-parse "release/v0.0.1"
+    [ "$(git --no-pager log -1 --pretty=%B --decorate=short | head -n 1)" == "update1" ]
+}

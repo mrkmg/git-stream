@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #
-# Run before a release is finished
+# Run before a release branch is updated
 # If this scripts exits with a non-zero code, the operation is canceled
 #
 # Arguments:
-# $1 version
-# $2 release-branch
+# $1 feature-name
+# $2 feature-branch
 # $3 working-branch
 
-VERSION=$1
+NAME=$1
 BRANCH=$2
 WORKING=$3
 

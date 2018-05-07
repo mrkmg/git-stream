@@ -3,11 +3,11 @@
 # Run after a release is finished
 #
 # Arguments:
-# $1 release-name
+# $1 version
 # $2 release-branch
 # $3 working-branch
 
-NAME=$1
+VERSION=$1
 BRANCH=$2
 WORKING=$3
 

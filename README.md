@@ -43,10 +43,11 @@ Example Installation on Linux
     git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
     cd /tmp/git-stream
     git submodule update --init --recursive
-    git checkout v0.7.2
+    #checkout latest release
+    git checkout $(git describe --abbrev=0 --tags)
     make test
     sudo make install
-    # To install the bash completion
+    # To install the bash and zsh completion
     sudo make install_completion
 
 By default, Git Stream will be installed to `/usr/local/bin`. If you would prefer to install somewhere else, you can
@@ -115,6 +116,7 @@ Work with releases. Releases are used to mark specific versions.
     start {version}
     finish [-l -m {message} -n -d] {version}
     list
+    update
 
     -m, --message {message}   A message for the merge (Implies -n)
     -n, --no-ff               Force a non fast-forward merge
@@ -156,8 +158,8 @@ So lets say you want to implement a new feature. Run the following:
     git stream feature start new-feature
 
 In the above command, "new-feature" is the name of the new feature. This will create a new branch named
-"feature/new-feature" forked from master. This is where you would implement your new feature and put you into that
-branch.
+"feature/new-feature" forked from master and put you into that branch. This is where you would implement
+your new feature.
 
 Feel free to switch back to master, or any other branch. Your branch will stay there and allow you to come back and work
 on the new feature anytime.
@@ -203,16 +205,18 @@ This should not have any conflicts, but if it does you can rebase like you did w
 release back into master and create a tag for the version. It will also push both your master branch and the new tags
 up to origin.
 
+    git stream release update 1.1.0
+
 The last feature is the hotfix. Lets say some time goes by, you have committed to master a few times, started a couple
 new features, but then a bug is reported that needs an immediate fix. This is where Hot Fixes come into play. If back in
-version 1.1.0 a critical bug was introduced. We would want the release a version 1.1.1 which addresses this bug.
+version 1.1.0 a critical bug was introduced, we would want the release a version 1.1.1 which addresses this bug.
 
 To make that fix, you start the hotfix.
 
     git stream hotfix start 1.1.0 security-flaw-bug
 
 This will create a branch named "hotfix/1.1.0-security-flaw-bug" forked from the tag 1.1.0. Fix the bug and then finish
-the hotfix, and implementing it in 1.1.1.
+the hotfix, and implement it in 1.1.1.
 
     git stream hotfix finish 1.1.0-security-flaw-bug 1.1.1
 

@@ -110,7 +110,7 @@ __git_stream_feature ()
 
 __git_stream_release ()
 {
-    local subcommands="list start finish help"
+    local subcommands="list start finish update help"
     local subcommand="$(__git_find_on_cmdline "$subcommands")"
     if [ -z "$subcommand" ]; then
         __gitcomp "$subcommands"

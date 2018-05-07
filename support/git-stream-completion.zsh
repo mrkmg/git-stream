@@ -1,5 +1,5 @@
-#!zsh
-#
+#compdef git-stream
+#autoload
 # Author: Copyright 2016 Kevin Gravier
 #
 #  Original Author: Copyright 2012-2013 Peter van der Does.
@@ -80,6 +80,7 @@ __git-stream-release ()
                 'start:Start a new release branch.'
                 'finish:Finish a release branch.'
                 'list:List all your release branches.'
+                'update:Rebase a release branch to master.'
             )
             _describe -t commands 'git stream release' subcommands
         ;;

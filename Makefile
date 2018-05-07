@@ -1,12 +1,14 @@
-VERSION		 				=	0.7.2
+VERSION						=	0.7.2
 
-PREFIX		  				?=	/usr/local
+PREFIX						?=	/usr/local
 DEST_BIN_DIR				=	$(PREFIX)/bin
-DEST_BASH_COMPLETION_DIR	= /etc/bash_completion.d
-SOURCE_BIN_DIR  			=	./bin/
-SOURCE_SUPPORT_DIR			= ./support/
-LOADER		  				=	git-stream
-COMPLETION_BASH				= git-stream-completion.bash
+DEST_BASH_COMPLETION_DIR	=	/etc/bash_completion.d
+DEST_ZSH_COMPLETION_DIR		=	/usr/share/zsh/site-functions
+SOURCE_BIN_DIR				=	./bin/
+SOURCE_SUPPORT_DIR			=	./support/
+LOADER						=	git-stream
+COMPLETION_BASH				=	git-stream-completion.bash
+COMPLETION_ZSH				=	git-stream-completion.zsh
 COMMANDS					=	git-stream-init
 COMMANDS					+=	git-stream-feature
 COMMANDS					+=	git-stream-feature-start
@@ -40,8 +42,14 @@ uninstall:
 
 install_completion:
 	test -d $(DEST_BASH_COMPLETION_DIR) && \
-	cd $(SOURCE_SUPPORT_DIR) && install -m 0644 -T $(COMPLETION_BASH) $(DEST_BASH_COMPLETION_DIR)/git-stream
+	cd $(SOURCE_SUPPORT_DIR) && install -m 0644 -T $(COMPLETION_BASH) $(DEST_BASH_COMPLETION_DIR)/git-stream || true
+
+	test -d $(DEST_ZSH_COMPLETION_DIR) && \
+	cd $(SOURCE_SUPPORT_DIR) && install -m 0644 -T $(COMPLETION_ZSH) $(DEST_ZSH_COMPLETION_DIR)/_git-stream || true
 
 uninstall_completion:
 	test -d $(DEST_BASH_COMPLETION_DIR) && \
 	rm -f $(DEST_BASH_COMPLETION_DIR)/git-stream
+
+	test -d $(DEST_ZSH_COMPLETION_DIR) && \
+	rm -f $(DEST_ZSH_COMPLETION_DIR)/_git-stream
