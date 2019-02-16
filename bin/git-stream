@@ -254,7 +254,7 @@ gitstream_source() {
 
     source ${file}
 
-    command_type=$(type ${func} | head -n 1)
+    command_type=$(LC_ALL=C type ${func} | head -n 1)
 
     if [ "${command_type}" != "${func} is a function" ]; then
         usage; exit 1
