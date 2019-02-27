@@ -43,7 +43,7 @@ Example Installation on Linux
     git clone https://github.com/mrkmg/git-stream.git /tmp/git-stream
     cd /tmp/git-stream
     git submodule update --init --recursive
-    #checkout latest release (v0.8.0)
+    #checkout latest release (v0.8.1)
     git checkout $(git describe --abbrev=0 --tags)
     make test
     sudo make install
